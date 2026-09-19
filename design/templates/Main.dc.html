@@ -1,0 +1,452 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Denial Management Dashboard</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600&amp;family=Instrument+Serif&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0;background:#f4f3ee;font-family:"IBM Plex Sans",system-ui,-apple-system,"Segoe UI",sans-serif;color:#141413}
+a{color:#1c5cab}a:hover{color:#104281}
+button{font:inherit;color:inherit}
+button:focus-visible{outline:2px solid #2a78d6;outline-offset:2px}
+.chip{cursor:pointer}
+.chip:hover{background:#eceae3}
+.chip.on,.chip.on:hover{background:#141413;color:#fcfcfb;border-color:#141413}
+.mark{cursor:pointer}
+.mark:hover .fill,.mark:focus-visible .fill{filter:brightness(1.12)}
+.rowpick{cursor:pointer}
+.rowpick:hover{text-decoration:underline}
+.cell:hover,.cell:focus-visible{outline:2px solid #141413;outline-offset:-2px}
+</style>
+</helmet>
+<div data-root="1" style="position: relative; width: 1440px; height: 1724px; box-sizing: border-box; padding: 48px; display: flex; flex-direction: column; gap: 24px; background: #f4f3ee;">
+
+<header style="height: 80px; display: flex; justify-content: space-between; align-items: flex-end;">
+<div style="display: flex; flex-direction: column; gap: 6px;">
+<div style="font-size: 12px; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; color: #52514e;">Revenue cycle · Service dates {{period}}</div>
+<h1 style="margin: 0; font-family: 'Instrument Serif', Georgia, serif; font-weight: 400; font-size: 44px; line-height: 1; letter-spacing: -0.01em;">Denial management</h1>
+</div>
+<div style="display: flex; flex-direction: column; align-items: flex-end; gap: 6px; font-size: 13px; color: #52514e;">
+<div>Denial rate = denied ÷ (paid + denied). Pending claims excluded.</div>
+<a href="Cleaning.dc.html" style="font-weight: 500;">{{cleanRows}} claims cleaned from {{rawRows}} raw rows · see the cleaning log</a>
+</div>
+</header>
+
+<nav aria-label="Payer filter" style="height: 48px; display: flex; align-items: center; gap: 8px;">
+<span style="font-size: 13px; color: #52514e; margin-right: 4px;">Payer</span>
+<sc-for list="{{chips}}" as="chip" hint-placeholder-count="9">
+<button type="button" class="chip {{chip.cls}}" onClick="{{chip.pick}}" aria-pressed="{{chip.on}}" style="height: 44px; padding: 0 16px; border-radius: 999px; border: 1px solid #d5d3ca; background: #fcfcfb; font-size: 13px; font-weight: 500;">{{chip.label}}</button>
+</sc-for>
+</nav>
+
+<section aria-label="Key figures" style="height: 120px; display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 24px;">
+<sc-for list="{{kpis}}" as="k" hint-placeholder-count="4">
+<div style="background: #fcfcfb; border: 1px solid #e1e0d9; border-radius: 8px; padding: 20px 24px; box-sizing: border-box; display: flex; flex-direction: column; justify-content: space-between;">
+<div style="font-size: 13px; color: #52514e;">{{k.label}}</div>
+<div style="display: flex; align-items: baseline; gap: 12px;">
+<div style="font-size: 36px; font-weight: 600; line-height: 1; letter-spacing: -0.02em;">{{k.value}}</div>
+<sc-if value="{{k.hasDelta}}" hint-placeholder-val="{{false}}">
+<div style="font-size: 13px; font-weight: 500; color: {{k.deltaColor}};">{{k.delta}}</div>
+</sc-if>
+</div>
+<div style="font-size: 12px; color: #52514e;">{{k.sub}}</div>
+</div>
+</sc-for>
+</section>
+
+<section aria-label="Payers and reasons" style="height: 440px; display: flex; gap: 24px;">
+
+<div style="width: 640px; background: #fcfcfb; border: 1px solid #e1e0d9; border-radius: 8px; padding: 20px 24px; box-sizing: border-box; display: flex; flex-direction: column; gap: 16px;">
+<div style="display: flex; justify-content: space-between; align-items: baseline;">
+<h2 style="margin: 0; font-size: 15px; font-weight: 600;">Denial rate by payer</h2>
+<div style="font-size: 12px; color: #52514e;">Click a bar to filter · hairline = all-payer average {{avgRate}}</div>
+</div>
+<div style="position: relative; display: flex; flex-direction: column; gap: 6px;">
+<div style="position: absolute; left: {{avgX}}px; top: -6px; bottom: -6px; width: 1px; background: #898781;"></div>
+<sc-for list="{{payerBars}}" as="b" hint-placeholder-count="8">
+<button type="button" class="mark" onClick="{{b.pick}}" onPointerEnter="{{b.enter}}" onPointerLeave="{{hideTip}}" onFocus="{{b.enter}}" onBlur="{{hideTip}}" style="display: flex; align-items: center; gap: 12px; height: 36px; padding: 0; border: 0; background: transparent; text-align: left;">
+<span style="width: 168px; font-size: 13px; font-weight: {{b.weight}}; color: #141413; white-space: nowrap;">{{b.payer}}</span>
+<span style="width: 356px; height: 22px; position: relative;">
+<span class="fill" style="position: absolute; left: 0; top: 0; height: 22px; width: {{b.w}}px; background: {{b.color}}; border-radius: 0 4px 4px 0;"></span>
+</span>
+<span style="width: 48px; font-size: 13px; font-weight: 600; font-variant-numeric: tabular-nums; color: #141413;">{{b.rate}}</span>
+</button>
+</sc-for>
+</div>
+</div>
+
+<div style="flex-grow: 1; background: #fcfcfb; border: 1px solid #e1e0d9; border-radius: 8px; padding: 20px 24px; box-sizing: border-box; display: flex; flex-direction: column; gap: 14px;">
+<div style="display: flex; justify-content: space-between; align-items: baseline;">
+<h2 style="margin: 0; font-size: 15px; font-weight: 600;">Why claims are denied · {{scopeLabel}}</h2>
+<div style="font-size: 12px; color: #52514e;">Share of {{scopeDenied}} denials</div>
+</div>
+<div style="display: flex; flex-direction: column; gap: 4px;">
+<sc-for list="{{catBars}}" as="c" hint-placeholder-count="9">
+<button type="button" class="mark" onPointerEnter="{{c.enter}}" onPointerLeave="{{hideTip}}" onFocus="{{c.enter}}" onBlur="{{hideTip}}" style="display: flex; align-items: center; gap: 12px; height: 32px; padding: 0; border: 0; background: transparent; text-align: left; cursor: default;">
+<span style="width: 168px; font-size: 13px; color: #141413; white-space: nowrap;">{{c.category}}</span>
+<span style="width: 372px; height: 20px; position: relative;">
+<span class="fill" style="position: absolute; left: 0; top: 0; height: 20px; width: {{c.w}}px; background: #2a78d6; border-radius: 0 4px 4px 0;"></span>
+</span>
+<span style="width: 68px; font-size: 13px; font-variant-numeric: tabular-nums; color: #141413; white-space: nowrap;"><strong style="font-weight: 600;">{{c.share}}</strong> <span style="color: #52514e;">· {{c.denied}}</span></span>
+</button>
+</sc-for>
+</div>
+<div style="font-size: 12px; line-height: 1.4; color: #52514e; border-top: 1px solid #e1e0d9; padding-top: 10px; margin-top: auto;"><strong style="font-weight: 600; color: #141413;">First fix for {{topCat}}:</strong> {{topAction}}</div>
+</div>
+
+</section>
+
+<section aria-label="Payer by reason heatmap" style="height: 440px; background: #fcfcfb; border: 1px solid #e1e0d9; border-radius: 8px; padding: 20px 24px; box-sizing: border-box; display: flex; flex-direction: column; gap: 12px;">
+<div style="display: flex; justify-content: space-between; align-items: baseline;">
+<h2 style="margin: 0; font-size: 15px; font-weight: 600;">Where each payer's denial rate comes from</h2>
+<div style="display: flex; align-items: center; gap: 8px; font-size: 12px; color: #52514e;">
+<span>% of the payer's adjudicated claims denied for this reason · row adds up to the payer's denial rate</span>
+<span style="font-variant-numeric: tabular-nums;">0%</span>
+<span style="display: flex; gap: 2px;">
+<span style="width: 16px; height: 10px; background: #cde2fb;"></span>
+<span style="width: 16px; height: 10px; background: #9ec5f4;"></span>
+<span style="width: 16px; height: 10px; background: #6da7ec;"></span>
+<span style="width: 16px; height: 10px; background: #3987e5;"></span>
+<span style="width: 16px; height: 10px; background: #256abf;"></span>
+<span style="width: 16px; height: 10px; background: #1c5cab;"></span>
+<span style="width: 16px; height: 10px; background: #0d366b;"></span>
+</span>
+<span style="font-variant-numeric: tabular-nums;">{{heatMax}}</span>
+</div>
+</div>
+<div style="display: grid; grid-template-columns: 200px repeat(9, minmax(0, 1fr)) 88px; gap: 2px; align-items: end; height: 32px;">
+<div style="font-size: 12px; color: #52514e;">Payer</div>
+<sc-for list="{{catHeads}}" as="h" hint-placeholder-count="9">
+<div style="font-size: 12px; color: #52514e; text-align: center; line-height: 1.2;">{{h.label}}</div>
+</sc-for>
+<div style="font-size: 12px; color: #52514e; text-align: right;">Denial rate</div>
+</div>
+<div style="display: flex; flex-direction: column; gap: 2px;">
+<sc-for list="{{heatRows}}" as="r" hint-placeholder-count="8">
+<div style="display: grid; grid-template-columns: 200px repeat(9, minmax(0, 1fr)) 88px; gap: 2px; height: 38px;">
+<button type="button" class="rowpick" onClick="{{r.pick}}" style="display: flex; align-items: center; gap: 8px; text-align: left; font-size: 13px; font-weight: {{r.weight}}; padding: 0 8px 0 0; border: 0; background: transparent; white-space: nowrap;">
+<span style="width: 6px; height: 6px; border-radius: 50%; background: {{r.dot}};"></span>
+<span>{{r.payer}}</span>
+</button>
+<sc-for list="{{r.cells}}" as="cell" hint-placeholder-count="9">
+<button type="button" class="cell" onPointerEnter="{{cell.enter}}" onPointerLeave="{{hideTip}}" onFocus="{{cell.enter}}" onBlur="{{hideTip}}" style="border: 0; border-radius: 3px; padding: 0; background: {{cell.bg}}; color: {{cell.ink}}; font-size: 13px; font-variant-numeric: tabular-nums; display: flex; align-items: center; justify-content: center;">{{cell.text}}</button>
+</sc-for>
+<div style="font-size: 13px; font-weight: 600; font-variant-numeric: tabular-nums; display: flex; align-items: center; justify-content: flex-end;">{{r.rate}}</div>
+</div>
+</sc-for>
+</div>
+</section>
+
+<section aria-label="Trend and codes" style="height: 380px; display: flex; gap: 24px;">
+
+<div style="width: 800px; background: #fcfcfb; border: 1px solid #e1e0d9; border-radius: 8px; padding: 20px 24px; box-sizing: border-box; display: flex; flex-direction: column; gap: 12px;">
+<div style="display: flex; justify-content: space-between; align-items: baseline;">
+<h2 style="margin: 0; font-size: 15px; font-weight: 600;">Monthly denial rate by service month</h2>
+<div style="display: flex; gap: 16px; font-size: 12px; color: #52514e;">
+<span style="display: flex; align-items: center; gap: 6px;"><span style="width: 16px; height: 2px; background: #2a78d6;"></span><span>{{scopeLabel}}</span></span>
+<sc-if value="{{hasSel}}" hint-placeholder-val="{{false}}">
+<span style="display: flex; align-items: center; gap: 6px;"><span style="width: 16px; height: 2px; background: #b8b7ae;"></span><span>All payers</span></span>
+</sc-if>
+</div>
+</div>
+<svg viewBox="0 0 752 264" width="752" height="264" role="img" aria-label="Line chart of monthly denial rate" style="display: block; overflow: visible;">
+<line x1="40" x2="696" y1="{{ty0}}" y2="{{ty0}}" style="stroke: #c3c2b7; stroke-width: 1px;"></line>
+<line x1="40" x2="696" y1="{{ty1}}" y2="{{ty1}}" style="stroke: #e1e0d9; stroke-width: 1px;"></line>
+<line x1="40" x2="696" y1="{{ty2}}" y2="{{ty2}}" style="stroke: #e1e0d9; stroke-width: 1px;"></line>
+<line x1="40" x2="696" y1="{{ty3}}" y2="{{ty3}}" style="stroke: #e1e0d9; stroke-width: 1px;"></line>
+<line x1="40" x2="696" y1="{{ty4}}" y2="{{ty4}}" style="stroke: #e1e0d9; stroke-width: 1px;"></line>
+<text x="32" y="{{tt0}}" style="text-anchor: end; font-size: 11px; fill: #75746e;">{{tl0}}</text>
+<text x="32" y="{{tt1}}" style="text-anchor: end; font-size: 11px; fill: #75746e;">{{tl1}}</text>
+<text x="32" y="{{tt2}}" style="text-anchor: end; font-size: 11px; fill: #75746e;">{{tl2}}</text>
+<text x="32" y="{{tt3}}" style="text-anchor: end; font-size: 11px; fill: #75746e;">{{tl3}}</text>
+<text x="32" y="{{tt4}}" style="text-anchor: end; font-size: 11px; fill: #75746e;">{{tl4}}</text>
+<path d="{{ctxPath}}" style="fill: none; stroke: #b8b7ae; stroke-width: 2px; stroke-linejoin: round; stroke-linecap: round;"></path>
+<path d="{{mainPath}}" style="fill: none; stroke: #2a78d6; stroke-width: 2px; stroke-linejoin: round; stroke-linecap: round;"></path>
+<line x1="{{crossX}}" x2="{{crossX}}" y1="8" y2="256" style="stroke: #898781; stroke-width: 1px; opacity: {{crossOpacity}};"></line>
+<circle cx="{{crossX}}" cy="{{crossY}}" r="5" style="fill: #2a78d6; stroke: #fcfcfb; stroke-width: 2px; opacity: {{crossOpacity}};"></circle>
+<circle cx="{{endX}}" cy="{{endY}}" r="5" style="fill: #2a78d6; stroke: #fcfcfb; stroke-width: 2px;"></circle>
+<text x="{{endLabelX}}" y="{{endLabelY}}" style="font-size: 12px; font-weight: 600; fill: #141413;">{{endLabel}}</text>
+<rect x="10.2" y="0" width="59.6" height="264" onPointerEnter="{{hit0}}" onPointerLeave="{{hideTip}}" style="fill: transparent; cursor: crosshair;"></rect>
+<rect x="69.8" y="0" width="59.6" height="264" onPointerEnter="{{hit1}}" onPointerLeave="{{hideTip}}" style="fill: transparent; cursor: crosshair;"></rect>
+<rect x="129.5" y="0" width="59.6" height="264" onPointerEnter="{{hit2}}" onPointerLeave="{{hideTip}}" style="fill: transparent; cursor: crosshair;"></rect>
+<rect x="189.1" y="0" width="59.6" height="264" onPointerEnter="{{hit3}}" onPointerLeave="{{hideTip}}" style="fill: transparent; cursor: crosshair;"></rect>
+<rect x="248.7" y="0" width="59.6" height="264" onPointerEnter="{{hit4}}" onPointerLeave="{{hideTip}}" style="fill: transparent; cursor: crosshair;"></rect>
+<rect x="308.4" y="0" width="59.6" height="264" onPointerEnter="{{hit5}}" onPointerLeave="{{hideTip}}" style="fill: transparent; cursor: crosshair;"></rect>
+<rect x="368.0" y="0" width="59.6" height="264" onPointerEnter="{{hit6}}" onPointerLeave="{{hideTip}}" style="fill: transparent; cursor: crosshair;"></rect>
+<rect x="427.6" y="0" width="59.6" height="264" onPointerEnter="{{hit7}}" onPointerLeave="{{hideTip}}" style="fill: transparent; cursor: crosshair;"></rect>
+<rect x="487.3" y="0" width="59.6" height="264" onPointerEnter="{{hit8}}" onPointerLeave="{{hideTip}}" style="fill: transparent; cursor: crosshair;"></rect>
+<rect x="546.9" y="0" width="59.6" height="264" onPointerEnter="{{hit9}}" onPointerLeave="{{hideTip}}" style="fill: transparent; cursor: crosshair;"></rect>
+<rect x="606.5" y="0" width="59.6" height="264" onPointerEnter="{{hit10}}" onPointerLeave="{{hideTip}}" style="fill: transparent; cursor: crosshair;"></rect>
+<rect x="666.2" y="0" width="59.6" height="264" onPointerEnter="{{hit11}}" onPointerLeave="{{hideTip}}" style="fill: transparent; cursor: crosshair;"></rect>
+</svg>
+<div style="margin-left: 10px; width: 716px; display: flex;">
+<sc-for list="{{xLabels}}" as="x" hint-placeholder-count="12">
+<div style="flex-grow: 1; flex-basis: 0; text-align: center; font-size: 11px; color: #75746e; white-space: nowrap;">{{x.label}}</div>
+</sc-for>
+</div>
+</div>
+
+<div style="flex-grow: 1; background: #fcfcfb; border: 1px solid #e1e0d9; border-radius: 8px; padding: 20px 24px; box-sizing: border-box; display: flex; flex-direction: column; gap: 12px;">
+<div style="display: flex; justify-content: space-between; align-items: baseline;">
+<h2 style="margin: 0; font-size: 15px; font-weight: 600;">Top denial codes · {{scopeLabel}}</h2>
+<div style="font-size: 12px; color: #52514e;">CARC</div>
+</div>
+<div style="display: grid; grid-template-columns: 64px minmax(0, 1fr) 48px 64px; gap: 0 12px; font-size: 12px; color: #52514e; padding-bottom: 6px; border-bottom: 1px solid #e1e0d9;">
+<div>Code</div>
+<div>Reason</div>
+<div style="text-align: right;">Claims</div>
+<div style="text-align: right;">Billed</div>
+</div>
+<div style="display: flex; flex-direction: column;">
+<sc-for list="{{codes}}" as="k" hint-placeholder-count="5">
+<div style="display: grid; grid-template-columns: 64px minmax(0, 1fr) 48px 64px; gap: 0 12px; align-items: center; height: 52px; border-bottom: 1px solid #efeee8;">
+<div style="font-size: 13px; font-weight: 600; font-variant-numeric: tabular-nums;">{{k.code}}</div>
+<div style="display: flex; flex-direction: column; gap: 2px; min-width: 0;">
+<div style="font-size: 13px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">{{k.reason}}</div>
+<div style="font-size: 12px; color: #52514e;">{{k.category}}</div>
+</div>
+<div style="font-size: 13px; text-align: right; font-variant-numeric: tabular-nums;">{{k.denied}}</div>
+<div style="font-size: 13px; text-align: right; font-variant-numeric: tabular-nums;">{{k.dollars}}</div>
+</div>
+</sc-for>
+</div>
+</div>
+
+</section>
+
+<sc-if value="{{hasTip}}" hint-placeholder-val="{{false}}">
+<div role="tooltip" style="position: absolute; left: {{tipX}}px; top: {{tipY}}px; transform: translate(-50%, calc(-100% - 10px)); background: #141413; color: #fcfcfb; border-radius: 6px; padding: 10px 12px; font-size: 12px; line-height: 1.4; pointer-events: none; min-width: 200px; max-width: 320px; box-shadow: 0 4px 16px rgba(20, 20, 19, 0.18); z-index: 10;">
+<div style="font-weight: 600; margin-bottom: 4px;">{{tipTitle}}</div>
+<sc-for list="{{tipLines}}" as="l" hint-placeholder-count="2">
+<div style="display: flex; justify-content: space-between; gap: 16px;"><span style="color: #c3c2b7;">{{l.label}}</span><span style="font-weight: 600; font-variant-numeric: tabular-nums; white-space: nowrap;">{{l.value}}</span></div>
+</sc-for>
+</div>
+</sc-if>
+
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1440,"height":1724}}'>
+const DATA = __DATA__;
+
+const RAMP = ['#cde2fb', '#9ec5f4', '#6da7ec', '#3987e5', '#256abf', '#1c5cab', '#0d366b'];
+const SHORT = {
+  'Eligibility': 'Eligibility', 'Coding Mismatch': 'Coding mismatch', 'Missing Information': 'Missing info',
+  'Prior Authorization': 'Prior auth', 'Medical Necessity': 'Medical necessity', 'Timely Filing': 'Timely filing',
+  'Duplicate Claim': 'Duplicate', 'Non-Covered Service': 'Non-covered', 'Other': 'Other'
+};
+const MONTHS = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+const MONTHS_LONG = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
+const PLOT = { x0: 40, x1: 696, y0: 8, y1: 256 };
+const TRACK = 356;
+
+const fmtPct = v => v.toFixed(1) + '%';
+const fmtInt = v => v.toLocaleString('en-US');
+const fmtMoney = v => v >= 1e6 ? '$' + (v / 1e6).toFixed(2) + 'M'
+  : v >= 1e3 ? '$' + Math.round(v / 1e3).toLocaleString('en-US') + 'K'
+  : '$' + Math.round(v);
+
+class Component extends DCLogic {
+  constructor(props) {
+    super(props);
+    this.state = { payer: null, tip: null, cross: -1 };
+  }
+
+  select(p) {
+    this.setState({ payer: this.state.payer === p ? null : p });
+  }
+
+  tipAt(e, title, lines, cross) {
+    const el = e.currentTarget;
+    const root = el && el.closest ? el.closest('[data-root]') : null;
+    if (!root) return;
+    const rr = root.getBoundingClientRect();
+    const r = el.getBoundingClientRect();
+    const x = Math.max(160, Math.min(rr.width - 160, r.left - rr.left + r.width / 2));
+    this.setState({ tip: { title, lines, x, y: r.top - rr.top }, cross: cross === undefined ? -1 : cross });
+  }
+
+  hide() {
+    if (this.state.tip || this.state.cross >= 0) this.setState({ tip: null, cross: -1 });
+  }
+
+  renderVals() {
+    const D = DATA, K = D.kpis, T = D.trend;
+    const sel = this.state.payer, tip = this.state.tip, cross = this.state.cross;
+    const payers = D.by_payer;
+    const P = sel ? payers.find(p => p.payer === sel) : null;
+    const scopeLabel = sel || 'All payers';
+    const hideTip = () => this.hide();
+
+    // ---- key figures for the current scope
+    const n = T.months.length, half = Math.floor(n / 2);
+    const cnt = sel ? T.counts.by_payer[sel] : T.counts.overall;
+    const rateOver = (from, to) => {
+      let d = 0, a = 0;
+      for (let i = from; i < to; i++) { d += cnt.denied[i]; a += cnt.adjudicated[i]; }
+      return a ? 100 * d / a : 0;
+    };
+    const delta = rateOver(half, n) - rateOver(0, half);
+    const S = P ? {
+      adjudicated: P.claims, denied: P.denied, rate: P.denial_rate, total: P.total_claims, pending: P.pending,
+      billed: P.billed, deniedDollars: P.denied_dollars,
+      overturned: P.overturned, upheld: P.upheld, open: P.appeal_pending, notAppealed: P.not_appealed
+    } : {
+      adjudicated: K.adjudicated, denied: K.denied, rate: K.denial_rate, total: K.claims, pending: K.pending,
+      billed: K.billed_total, deniedDollars: K.denied_dollars,
+      overturned: K.overturned, upheld: K.upheld, open: K.appeal_pending, notAppealed: K.not_appealed
+    };
+    const decided = S.overturned + S.upheld;
+    const kpis = [
+      {
+        label: 'Denial rate', value: fmtPct(S.rate), hasDelta: true,
+        delta: (delta >= 0 ? '+' : '−') + Math.abs(delta).toFixed(1) + ' pts, second half vs first',
+        deltaColor: delta > 0 ? '#b3261e' : '#006300',
+        sub: fmtInt(S.denied) + ' of ' + fmtInt(S.adjudicated) + ' adjudicated claims'
+      },
+      {
+        label: 'Denied claims', value: fmtInt(S.denied), hasDelta: false, delta: '', deltaColor: '#141413',
+        sub: fmtInt(S.pending) + ' still pending · ' + fmtInt(S.total) + ' claims in scope'
+      },
+      {
+        label: 'Denied dollars', value: fmtMoney(S.deniedDollars), hasDelta: false, delta: '', deltaColor: '#141413',
+        sub: fmtPct(S.billed ? 100 * S.deniedDollars / S.billed : 0) + ' of ' + fmtMoney(S.billed) + ' billed'
+      },
+      {
+        label: 'Appeal overturn rate', value: decided ? fmtPct(100 * S.overturned / decided) : '–', hasDelta: false, delta: '', deltaColor: '#141413',
+        sub: S.overturned + ' overturned · ' + S.upheld + ' upheld · ' + S.open + ' open · ' + S.notAppealed + ' not appealed'
+      }
+    ];
+
+    // ---- payer filter chips (same order as the bars)
+    const chips = [{ label: 'All payers', on: !sel, cls: !sel ? 'on' : '', pick: () => this.setState({ payer: null }) }]
+      .concat(payers.map(p => ({ label: p.payer, on: sel === p.payer, cls: sel === p.payer ? 'on' : '', pick: () => this.select(p.payer) })));
+
+    // ---- denial rate by payer
+    const maxRate = Math.max(25, Math.ceil(Math.max.apply(null, payers.map(p => p.denial_rate)) * 1.15 / 5) * 5);
+    const payerBars = payers.map(p => ({
+      payer: p.payer,
+      rate: fmtPct(p.denial_rate),
+      w: Math.max(2, Math.round(p.denial_rate / maxRate * TRACK)),
+      color: !sel || sel === p.payer ? '#2a78d6' : '#cfcec5',
+      weight: sel === p.payer ? 600 : 400,
+      pick: () => this.select(p.payer),
+      enter: e => this.tipAt(e, p.payer, [
+        { label: 'Denial rate', value: fmtPct(p.denial_rate) },
+        { label: 'Denied / adjudicated', value: fmtInt(p.denied) + ' / ' + fmtInt(p.claims) },
+        { label: 'Denied dollars', value: fmtMoney(p.denied_dollars) },
+        { label: 'Top reason', value: p.top_category + ' (' + fmtPct(p.top_category_share) + ')' }
+      ])
+    }));
+    const avgX = 180 + Math.round(K.denial_rate / maxRate * TRACK);
+
+    // ---- why claims are denied, for the current scope
+    const row = sel ? D.matrix.find(r => r.payer === sel) : null;
+    const cats = (row
+      ? row.cells.map(c => ({ category: c.category, denied: c.denied, share: c.pct_of_payer_denials }))
+      : D.by_category.map(c => ({ category: c.category, denied: c.denied, share: c.share })))
+      .sort((a, b) => b.denied - a.denied || a.category.localeCompare(b.category));
+    const maxShare = Math.max(1, Math.max.apply(null, cats.map(c => c.share)));
+    const actions = {};
+    D.by_category.forEach(c => { actions[c.category] = c.action; });
+    const catBars = cats.map(c => ({
+      category: c.category,
+      denied: fmtInt(c.denied),
+      share: fmtPct(c.share),
+      w: Math.round(c.share / maxShare * 340),
+      enter: e => this.tipAt(e, c.category + ' · ' + scopeLabel, [
+        { label: 'Denied claims', value: fmtInt(c.denied) },
+        { label: 'Share of denials', value: fmtPct(c.share) }
+      ])
+    }));
+    const topCat = cats[0].category;
+
+    // ---- payer x reason heatmap (all payers; the selected row is marked)
+    let heatMax = 0;
+    D.matrix.forEach(r => r.cells.forEach(c => { heatMax = Math.max(heatMax, c.pct_of_payer_claims); }));
+    const catHeads = D.by_category.map(c => ({ label: SHORT[c.category] || c.category }));
+    const heatRows = D.matrix.map(r => {
+      const p = payers.find(x => x.payer === r.payer);
+      return {
+        payer: r.payer,
+        rate: fmtPct(p ? p.denial_rate : 0),
+        weight: sel === r.payer ? 600 : 400,
+        dot: sel === r.payer ? '#2a78d6' : 'transparent',
+        pick: () => this.select(r.payer),
+        cells: r.cells.map(c => {
+          const v = c.pct_of_payer_claims;
+          const idx = v > 0 ? Math.min(RAMP.length - 1, Math.ceil(v / heatMax * RAMP.length) - 1) : -1;
+          return {
+            text: v > 0 ? v.toFixed(1) : '–',
+            bg: idx < 0 ? '#f0efec' : RAMP[idx],
+            ink: idx < 0 ? '#75746e' : idx <= 3 ? '#141413' : '#ffffff',
+            enter: e => this.tipAt(e, r.payer + ' · ' + c.category, [
+              { label: 'Denied claims', value: fmtInt(c.denied) },
+              { label: 'Share of this payer’s denials', value: fmtPct(c.pct_of_payer_denials) },
+              { label: 'Share of this payer’s claims', value: fmtPct(v) }
+            ])
+          };
+        })
+      };
+    });
+
+    // ---- monthly trend: the scope in blue, all payers as grey context when a payer is selected
+    const main = sel ? T.by_payer[sel] : T.overall;
+    const ctx = sel ? T.overall : null;
+    const yMax = Math.max(40, Math.ceil(Math.max.apply(null, main.concat(ctx || [0])) / 10) * 10);
+    const X = i => PLOT.x0 + i * (PLOT.x1 - PLOT.x0) / (n - 1);
+    const Y = v => PLOT.y1 - v / yMax * (PLOT.y1 - PLOT.y0);
+    const path = arr => arr.map((v, i) => (i ? 'L' : 'M') + X(i).toFixed(1) + ' ' + Y(v).toFixed(1)).join(' ');
+    const ticks = {};
+    for (let k = 0; k < 5; k++) {
+      const t = yMax / 4 * k;
+      ticks['ty' + k] = Y(t).toFixed(1);
+      ticks['tt' + k] = (Y(t) + 4).toFixed(1);
+      ticks['tl' + k] = Math.round(t) + '%';
+    }
+    const xLabels = T.months.map((ym, i) => {
+      const parts = ym.split('-'), mi = +parts[1] - 1;
+      return { label: MONTHS[mi] + (i === 0 || mi === 0 ? ' ’' + parts[0].slice(2) : '') };
+    });
+    const hits = {};
+    T.months.forEach((ym, i) => {
+      hits['hit' + i] = e => {
+        const parts = ym.split('-');
+        const lines = [{ label: scopeLabel, value: fmtPct(main[i]) }];
+        if (ctx) lines.push({ label: 'All payers', value: fmtPct(ctx[i]) });
+        lines.push({ label: 'Adjudicated claims', value: fmtInt(cnt.adjudicated[i]) + ' (' + fmtInt(cnt.denied[i]) + ' denied)' });
+        this.tipAt(e, MONTHS_LONG[+parts[1] - 1] + ' ' + parts[0], lines, i);
+      };
+    });
+    const last = n - 1;
+
+    // ---- top denial codes for the current scope
+    const codes = (sel ? D.codes_by_payer[sel] : D.top_codes).slice(0, 5).map(k => ({
+      code: k.code, reason: k.reason, category: k.category, denied: fmtInt(k.denied), dollars: fmtMoney(k.denied_dollars)
+    }));
+
+    return Object.assign({
+      period: D.meta.period.replace(' to ', ' – '),
+      cleanRows: fmtInt(D.meta.clean_rows), rawRows: fmtInt(D.meta.raw_rows),
+      chips, kpis,
+      payerBars, avgX, avgRate: fmtPct(K.denial_rate),
+      catBars, scopeLabel, scopeDenied: fmtInt(S.denied), topCat, topAction: actions[topCat] || '',
+      heatMax: fmtPct(heatMax), catHeads, heatRows,
+      hasSel: !!sel, mainPath: path(main), ctxPath: ctx ? path(ctx) : '',
+      endX: X(last).toFixed(1), endY: Y(main[last]).toFixed(1), endLabel: fmtPct(main[last]),
+      endLabelX: (X(last) + 10).toFixed(1), endLabelY: (Y(main[last]) + 4).toFixed(1),
+      crossX: cross >= 0 ? X(cross).toFixed(1) : -100, crossY: cross >= 0 ? Y(main[cross]).toFixed(1) : -100,
+      crossOpacity: cross >= 0 ? 1 : 0,
+      xLabels, codes,
+      hasTip: !!tip, tipX: tip ? tip.x : 0, tipY: tip ? tip.y : 0, tipTitle: tip ? tip.title : '', tipLines: tip ? tip.lines : [],
+      hideTip
+    }, ticks, hits);
+  }
+}
+</script>
+</body>
+</html>

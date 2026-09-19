@@ -1,0 +1,62 @@
+{
+  "source": "data/raw_claims.csv",
+  "generated": "2026-09-19",
+  "steps": [
+    {
+      "step": "Trim whitespace",
+      "rows_removed": 0,
+      "values_repaired": 731,
+      "detail": "Leading/trailing spaces removed from all text fields."
+    },
+    {
+      "step": "Remove test records",
+      "rows_removed": 20,
+      "values_repaired": 0,
+      "detail": "claim_id starting TST- or patient_id starting TEST."
+    },
+    {
+      "step": "Standardize payer names",
+      "rows_removed": 27,
+      "values_repaired": 1969,
+      "detail": "46 spelling variants collapsed to 8 payers. Dropped 27 rows whose payer was blank, N/A, UNKNOWN."
+    },
+    {
+      "step": "Parse mixed date formats",
+      "rows_removed": 0,
+      "values_repaired": 4964,
+      "detail": "ISO, MM/DD/YYYY, DD-Mon-YYYY and YYYYMMDD parsed to one date type."
+    },
+    {
+      "step": "Standardize claim status",
+      "rows_removed": 34,
+      "values_repaired": 1580,
+      "detail": "17 spellings mapped to Paid / Denied / Pending; 'Rejected' folded into Denied. 34 rows with a blank status dropped."
+    },
+    {
+      "step": "Parse billed amounts",
+      "rows_removed": 0,
+      "values_repaired": 657,
+      "detail": "Currency symbols and thousands separators removed. 24 non-positive or non-numeric amounts set to null (kept for rate metrics, excluded from dollar totals)."
+    },
+    {
+      "step": "Normalize denial codes",
+      "rows_removed": 0,
+      "values_repaired": 329,
+      "detail": "CO16, co-16, 'CO 16', 16 and CO-016 unified to GROUP-NUMBER; 22 codes without a group assumed CO; 15 stale codes on paid claims cleared."
+    },
+    {
+      "step": "Normalize CPT and ICD-10",
+      "rows_removed": 0,
+      "values_repaired": 187,
+      "detail": "Upper-cased; ICD-10 codes missing the decimal had it restored."
+    },
+    {
+      "step": "Remove duplicates",
+      "rows_removed": 107,
+      "values_repaired": 0,
+      "detail": "70 exact duplicate rows dropped. 37 resubmitted claims collapsed to their latest submission."
+    }
+  ],
+  "raw_rows": 2529,
+  "clean_rows": 2341
+}

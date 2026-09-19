@@ -1,0 +1,1733 @@
+{
+  "meta": {
+    "title": "Denial Management Dashboard",
+    "period": "2025-09-01 to 2026-08-31",
+    "rate_definition": "Denial rate = denied claims / (paid + denied claims). Pending claims excluded.",
+    "raw_rows": 2529,
+    "clean_rows": 2341
+  },
+  "kpis": {
+    "claims": 2341,
+    "adjudicated": 2186,
+    "denied": 285,
+    "pending": 155,
+    "denial_rate": 13.0,
+    "billed_total": 1650380.66,
+    "denied_dollars": 206236.43,
+    "denied_dollar_share": 12.5,
+    "appealed": 113,
+    "overturned": 51,
+    "upheld": 20,
+    "appeal_pending": 42,
+    "not_appealed": 172,
+    "period_start": "2025-09-01",
+    "period_end": "2026-08-31",
+    "overturn_rate": 71.8
+  },
+  "by_payer": [
+    {
+      "payer": "Medicaid",
+      "claims": 242,
+      "denied": 49,
+      "denial_rate": 20.2,
+      "billed": 144124.31,
+      "denied_dollars": 18603.66,
+      "top_category": "Eligibility",
+      "top_category_share": 42.9,
+      "total_claims": 262,
+      "pending": 20,
+      "appealed": 18,
+      "overturned": 7,
+      "upheld": 4,
+      "appeal_pending": 7,
+      "not_appealed": 31
+    },
+    {
+      "payer": "UnitedHealthcare",
+      "claims": 367,
+      "denied": 70,
+      "denial_rate": 19.1,
+      "billed": 240492.1,
+      "denied_dollars": 50927.48,
+      "top_category": "Prior Authorization",
+      "top_category_share": 38.6,
+      "total_claims": 397,
+      "pending": 30,
+      "appealed": 27,
+      "overturned": 11,
+      "upheld": 4,
+      "appeal_pending": 12,
+      "not_appealed": 43
+    },
+    {
+      "payer": "Cigna",
+      "claims": 202,
+      "denied": 30,
+      "denial_rate": 14.9,
+      "billed": 144333.76,
+      "denied_dollars": 17130.8,
+      "top_category": "Coding Mismatch",
+      "top_category_share": 33.3,
+      "total_claims": 215,
+      "pending": 13,
+      "appealed": 14,
+      "overturned": 8,
+      "upheld": 3,
+      "appeal_pending": 3,
+      "not_appealed": 16
+    },
+    {
+      "payer": "Aetna",
+      "claims": 265,
+      "denied": 37,
+      "denial_rate": 14.0,
+      "billed": 290065.92,
+      "denied_dollars": 42527.52,
+      "top_category": "Coding Mismatch",
+      "top_category_share": 29.7,
+      "total_claims": 284,
+      "pending": 19,
+      "appealed": 13,
+      "overturned": 7,
+      "upheld": 3,
+      "appeal_pending": 3,
+      "not_appealed": 24
+    },
+    {
+      "payer": "Blue Cross Blue Shield",
+      "claims": 383,
+      "denied": 48,
+      "denial_rate": 12.5,
+      "billed": 330773.15,
+      "denied_dollars": 48210.4,
+      "top_category": "Coding Mismatch",
+      "top_category_share": 20.8,
+      "total_claims": 406,
+      "pending": 23,
+      "appealed": 19,
+      "overturned": 8,
+      "upheld": 4,
+      "appeal_pending": 7,
+      "not_appealed": 29
+    },
+    {
+      "payer": "Kaiser Permanente",
+      "claims": 76,
+      "denied": 8,
+      "denial_rate": 10.5,
+      "billed": 46720.85,
+      "denied_dollars": 743.0,
+      "top_category": "Non-Covered Service",
+      "top_category_share": 62.5,
+      "total_claims": 80,
+      "pending": 4,
+      "appealed": 5,
+      "overturned": 4,
+      "upheld": 1,
+      "appeal_pending": 0,
+      "not_appealed": 3
+    },
+    {
+      "payer": "Humana",
+      "claims": 148,
+      "denied": 12,
+      "denial_rate": 8.1,
+      "billed": 82343.36,
+      "denied_dollars": 2122.44,
+      "top_category": "Coding Mismatch",
+      "top_category_share": 25.0,
+      "total_claims": 159,
+      "pending": 11,
+      "appealed": 5,
+      "overturned": 2,
+      "upheld": 1,
+      "appeal_pending": 2,
+      "not_appealed": 7
+    },
+    {
+      "payer": "Medicare",
+      "claims": 503,
+      "denied": 31,
+      "denial_rate": 6.2,
+      "billed": 371527.21,
+      "denied_dollars": 25971.13,
+      "top_category": "Coding Mismatch",
+      "top_category_share": 32.3,
+      "total_claims": 538,
+      "pending": 35,
+      "appealed": 12,
+      "overturned": 4,
+      "upheld": 0,
+      "appeal_pending": 8,
+      "not_appealed": 19
+    }
+  ],
+  "by_category": [
+    {
+      "category": "Eligibility",
+      "denied": 41,
+      "share": 14.4,
+      "denied_dollars": 26854.92,
+      "action": "Verify coverage at scheduling; re-check 48h before the visit."
+    },
+    {
+      "category": "Coding Mismatch",
+      "denied": 63,
+      "share": 22.1,
+      "denied_dollars": 29018.88,
+      "action": "Coder review of CPT/ICD/modifier pairing before submission."
+    },
+    {
+      "category": "Missing Information",
+      "denied": 31,
+      "share": 10.9,
+      "denied_dollars": 24700.17,
+      "action": "Front-end claim scrubber edits; attach documentation up front."
+    },
+    {
+      "category": "Prior Authorization",
+      "denied": 51,
+      "share": 17.9,
+      "denied_dollars": 18774.52,
+      "action": "Auth-required list by payer; obtain and record auth before service."
+    },
+    {
+      "category": "Medical Necessity",
+      "denied": 29,
+      "share": 10.2,
+      "denied_dollars": 23664.07,
+      "action": "Diagnosis documentation and LCD/NCD checks for high-value procedures."
+    },
+    {
+      "category": "Timely Filing",
+      "denied": 29,
+      "share": 10.2,
+      "denied_dollars": 49052.65,
+      "action": "Submission-lag alerts; work the aging queue weekly."
+    },
+    {
+      "category": "Duplicate Claim",
+      "denied": 15,
+      "share": 5.3,
+      "denied_dollars": 13493.4,
+      "action": "Suppress resubmits until the original adjudicates; fix batch logic."
+    },
+    {
+      "category": "Non-Covered Service",
+      "denied": 16,
+      "share": 5.6,
+      "denied_dollars": 13909.62,
+      "action": "Benefit check and ABN/waiver before service."
+    },
+    {
+      "category": "Other",
+      "denied": 10,
+      "share": 3.5,
+      "denied_dollars": 6768.2,
+      "action": "Route to payer-relations for COB, bundling and fee-schedule disputes."
+    }
+  ],
+  "matrix": [
+    {
+      "payer": "Medicaid",
+      "cells": [
+        {
+          "category": "Eligibility",
+          "denied": 21,
+          "pct_of_payer_denials": 42.9,
+          "pct_of_payer_claims": 8.7
+        },
+        {
+          "category": "Coding Mismatch",
+          "denied": 6,
+          "pct_of_payer_denials": 12.2,
+          "pct_of_payer_claims": 2.5
+        },
+        {
+          "category": "Missing Information",
+          "denied": 7,
+          "pct_of_payer_denials": 14.3,
+          "pct_of_payer_claims": 2.9
+        },
+        {
+          "category": "Prior Authorization",
+          "denied": 9,
+          "pct_of_payer_denials": 18.4,
+          "pct_of_payer_claims": 3.7
+        },
+        {
+          "category": "Medical Necessity",
+          "denied": 0,
+          "pct_of_payer_denials": 0.0,
+          "pct_of_payer_claims": 0.0
+        },
+        {
+          "category": "Timely Filing",
+          "denied": 3,
+          "pct_of_payer_denials": 6.1,
+          "pct_of_payer_claims": 1.2
+        },
+        {
+          "category": "Duplicate Claim",
+          "denied": 1,
+          "pct_of_payer_denials": 2.0,
+          "pct_of_payer_claims": 0.4
+        },
+        {
+          "category": "Non-Covered Service",
+          "denied": 1,
+          "pct_of_payer_denials": 2.0,
+          "pct_of_payer_claims": 0.4
+        },
+        {
+          "category": "Other",
+          "denied": 1,
+          "pct_of_payer_denials": 2.0,
+          "pct_of_payer_claims": 0.4
+        }
+      ]
+    },
+    {
+      "payer": "UnitedHealthcare",
+      "cells": [
+        {
+          "category": "Eligibility",
+          "denied": 3,
+          "pct_of_payer_denials": 4.3,
+          "pct_of_payer_claims": 0.8
+        },
+        {
+          "category": "Coding Mismatch",
+          "denied": 12,
+          "pct_of_payer_denials": 17.1,
+          "pct_of_payer_claims": 3.3
+        },
+        {
+          "category": "Missing Information",
+          "denied": 3,
+          "pct_of_payer_denials": 4.3,
+          "pct_of_payer_claims": 0.8
+        },
+        {
+          "category": "Prior Authorization",
+          "denied": 27,
+          "pct_of_payer_denials": 38.6,
+          "pct_of_payer_claims": 7.4
+        },
+        {
+          "category": "Medical Necessity",
+          "denied": 14,
+          "pct_of_payer_denials": 20.0,
+          "pct_of_payer_claims": 3.8
+        },
+        {
+          "category": "Timely Filing",
+          "denied": 5,
+          "pct_of_payer_denials": 7.1,
+          "pct_of_payer_claims": 1.4
+        },
+        {
+          "category": "Duplicate Claim",
+          "denied": 1,
+          "pct_of_payer_denials": 1.4,
+          "pct_of_payer_claims": 0.3
+        },
+        {
+          "category": "Non-Covered Service",
+          "denied": 3,
+          "pct_of_payer_denials": 4.3,
+          "pct_of_payer_claims": 0.8
+        },
+        {
+          "category": "Other",
+          "denied": 2,
+          "pct_of_payer_denials": 2.9,
+          "pct_of_payer_claims": 0.5
+        }
+      ]
+    },
+    {
+      "payer": "Cigna",
+      "cells": [
+        {
+          "category": "Eligibility",
+          "denied": 4,
+          "pct_of_payer_denials": 13.3,
+          "pct_of_payer_claims": 2.0
+        },
+        {
+          "category": "Coding Mismatch",
+          "denied": 10,
+          "pct_of_payer_denials": 33.3,
+          "pct_of_payer_claims": 5.0
+        },
+        {
+          "category": "Missing Information",
+          "denied": 1,
+          "pct_of_payer_denials": 3.3,
+          "pct_of_payer_claims": 0.5
+        },
+        {
+          "category": "Prior Authorization",
+          "denied": 3,
+          "pct_of_payer_denials": 10.0,
+          "pct_of_payer_claims": 1.5
+        },
+        {
+          "category": "Medical Necessity",
+          "denied": 0,
+          "pct_of_payer_denials": 0.0,
+          "pct_of_payer_claims": 0.0
+        },
+        {
+          "category": "Timely Filing",
+          "denied": 8,
+          "pct_of_payer_denials": 26.7,
+          "pct_of_payer_claims": 4.0
+        },
+        {
+          "category": "Duplicate Claim",
+          "denied": 3,
+          "pct_of_payer_denials": 10.0,
+          "pct_of_payer_claims": 1.5
+        },
+        {
+          "category": "Non-Covered Service",
+          "denied": 0,
+          "pct_of_payer_denials": 0.0,
+          "pct_of_payer_claims": 0.0
+        },
+        {
+          "category": "Other",
+          "denied": 1,
+          "pct_of_payer_denials": 3.3,
+          "pct_of_payer_claims": 0.5
+        }
+      ]
+    },
+    {
+      "payer": "Aetna",
+      "cells": [
+        {
+          "category": "Eligibility",
+          "denied": 4,
+          "pct_of_payer_denials": 10.8,
+          "pct_of_payer_claims": 1.5
+        },
+        {
+          "category": "Coding Mismatch",
+          "denied": 11,
+          "pct_of_payer_denials": 29.7,
+          "pct_of_payer_claims": 4.2
+        },
+        {
+          "category": "Missing Information",
+          "denied": 7,
+          "pct_of_payer_denials": 18.9,
+          "pct_of_payer_claims": 2.6
+        },
+        {
+          "category": "Prior Authorization",
+          "denied": 3,
+          "pct_of_payer_denials": 8.1,
+          "pct_of_payer_claims": 1.1
+        },
+        {
+          "category": "Medical Necessity",
+          "denied": 5,
+          "pct_of_payer_denials": 13.5,
+          "pct_of_payer_claims": 1.9
+        },
+        {
+          "category": "Timely Filing",
+          "denied": 4,
+          "pct_of_payer_denials": 10.8,
+          "pct_of_payer_claims": 1.5
+        },
+        {
+          "category": "Duplicate Claim",
+          "denied": 2,
+          "pct_of_payer_denials": 5.4,
+          "pct_of_payer_claims": 0.8
+        },
+        {
+          "category": "Non-Covered Service",
+          "denied": 1,
+          "pct_of_payer_denials": 2.7,
+          "pct_of_payer_claims": 0.4
+        },
+        {
+          "category": "Other",
+          "denied": 0,
+          "pct_of_payer_denials": 0.0,
+          "pct_of_payer_claims": 0.0
+        }
+      ]
+    },
+    {
+      "payer": "Blue Cross Blue Shield",
+      "cells": [
+        {
+          "category": "Eligibility",
+          "denied": 6,
+          "pct_of_payer_denials": 12.5,
+          "pct_of_payer_claims": 1.6
+        },
+        {
+          "category": "Coding Mismatch",
+          "denied": 10,
+          "pct_of_payer_denials": 20.8,
+          "pct_of_payer_claims": 2.6
+        },
+        {
+          "category": "Missing Information",
+          "denied": 8,
+          "pct_of_payer_denials": 16.7,
+          "pct_of_payer_claims": 2.1
+        },
+        {
+          "category": "Prior Authorization",
+          "denied": 7,
+          "pct_of_payer_denials": 14.6,
+          "pct_of_payer_claims": 1.8
+        },
+        {
+          "category": "Medical Necessity",
+          "denied": 3,
+          "pct_of_payer_denials": 6.2,
+          "pct_of_payer_claims": 0.8
+        },
+        {
+          "category": "Timely Filing",
+          "denied": 6,
+          "pct_of_payer_denials": 12.5,
+          "pct_of_payer_claims": 1.6
+        },
+        {
+          "category": "Duplicate Claim",
+          "denied": 2,
+          "pct_of_payer_denials": 4.2,
+          "pct_of_payer_claims": 0.5
+        },
+        {
+          "category": "Non-Covered Service",
+          "denied": 3,
+          "pct_of_payer_denials": 6.2,
+          "pct_of_payer_claims": 0.8
+        },
+        {
+          "category": "Other",
+          "denied": 3,
+          "pct_of_payer_denials": 6.2,
+          "pct_of_payer_claims": 0.8
+        }
+      ]
+    },
+    {
+      "payer": "Kaiser Permanente",
+      "cells": [
+        {
+          "category": "Eligibility",
+          "denied": 1,
+          "pct_of_payer_denials": 12.5,
+          "pct_of_payer_claims": 1.3
+        },
+        {
+          "category": "Coding Mismatch",
+          "denied": 1,
+          "pct_of_payer_denials": 12.5,
+          "pct_of_payer_claims": 1.3
+        },
+        {
+          "category": "Missing Information",
+          "denied": 0,
+          "pct_of_payer_denials": 0.0,
+          "pct_of_payer_claims": 0.0
+        },
+        {
+          "category": "Prior Authorization",
+          "denied": 0,
+          "pct_of_payer_denials": 0.0,
+          "pct_of_payer_claims": 0.0
+        },
+        {
+          "category": "Medical Necessity",
+          "denied": 0,
+          "pct_of_payer_denials": 0.0,
+          "pct_of_payer_claims": 0.0
+        },
+        {
+          "category": "Timely Filing",
+          "denied": 0,
+          "pct_of_payer_denials": 0.0,
+          "pct_of_payer_claims": 0.0
+        },
+        {
+          "category": "Duplicate Claim",
+          "denied": 1,
+          "pct_of_payer_denials": 12.5,
+          "pct_of_payer_claims": 1.3
+        },
+        {
+          "category": "Non-Covered Service",
+          "denied": 5,
+          "pct_of_payer_denials": 62.5,
+          "pct_of_payer_claims": 6.6
+        },
+        {
+          "category": "Other",
+          "denied": 0,
+          "pct_of_payer_denials": 0.0,
+          "pct_of_payer_claims": 0.0
+        }
+      ]
+    },
+    {
+      "payer": "Humana",
+      "cells": [
+        {
+          "category": "Eligibility",
+          "denied": 0,
+          "pct_of_payer_denials": 0.0,
+          "pct_of_payer_claims": 0.0
+        },
+        {
+          "category": "Coding Mismatch",
+          "denied": 3,
+          "pct_of_payer_denials": 25.0,
+          "pct_of_payer_claims": 2.0
+        },
+        {
+          "category": "Missing Information",
+          "denied": 1,
+          "pct_of_payer_denials": 8.3,
+          "pct_of_payer_claims": 0.7
+        },
+        {
+          "category": "Prior Authorization",
+          "denied": 2,
+          "pct_of_payer_denials": 16.7,
+          "pct_of_payer_claims": 1.4
+        },
+        {
+          "category": "Medical Necessity",
+          "denied": 3,
+          "pct_of_payer_denials": 25.0,
+          "pct_of_payer_claims": 2.0
+        },
+        {
+          "category": "Timely Filing",
+          "denied": 1,
+          "pct_of_payer_denials": 8.3,
+          "pct_of_payer_claims": 0.7
+        },
+        {
+          "category": "Duplicate Claim",
+          "denied": 1,
+          "pct_of_payer_denials": 8.3,
+          "pct_of_payer_claims": 0.7
+        },
+        {
+          "category": "Non-Covered Service",
+          "denied": 1,
+          "pct_of_payer_denials": 8.3,
+          "pct_of_payer_claims": 0.7
+        },
+        {
+          "category": "Other",
+          "denied": 0,
+          "pct_of_payer_denials": 0.0,
+          "pct_of_payer_claims": 0.0
+        }
+      ]
+    },
+    {
+      "payer": "Medicare",
+      "cells": [
+        {
+          "category": "Eligibility",
+          "denied": 2,
+          "pct_of_payer_denials": 6.5,
+          "pct_of_payer_claims": 0.4
+        },
+        {
+          "category": "Coding Mismatch",
+          "denied": 10,
+          "pct_of_payer_denials": 32.3,
+          "pct_of_payer_claims": 2.0
+        },
+        {
+          "category": "Missing Information",
+          "denied": 4,
+          "pct_of_payer_denials": 12.9,
+          "pct_of_payer_claims": 0.8
+        },
+        {
+          "category": "Prior Authorization",
+          "denied": 0,
+          "pct_of_payer_denials": 0.0,
+          "pct_of_payer_claims": 0.0
+        },
+        {
+          "category": "Medical Necessity",
+          "denied": 4,
+          "pct_of_payer_denials": 12.9,
+          "pct_of_payer_claims": 0.8
+        },
+        {
+          "category": "Timely Filing",
+          "denied": 2,
+          "pct_of_payer_denials": 6.5,
+          "pct_of_payer_claims": 0.4
+        },
+        {
+          "category": "Duplicate Claim",
+          "denied": 4,
+          "pct_of_payer_denials": 12.9,
+          "pct_of_payer_claims": 0.8
+        },
+        {
+          "category": "Non-Covered Service",
+          "denied": 2,
+          "pct_of_payer_denials": 6.5,
+          "pct_of_payer_claims": 0.4
+        },
+        {
+          "category": "Other",
+          "denied": 3,
+          "pct_of_payer_denials": 9.7,
+          "pct_of_payer_claims": 0.6
+        }
+      ]
+    }
+  ],
+  "trend": {
+    "months": [
+      "2025-09",
+      "2025-10",
+      "2025-11",
+      "2025-12",
+      "2026-01",
+      "2026-02",
+      "2026-03",
+      "2026-04",
+      "2026-05",
+      "2026-06",
+      "2026-07",
+      "2026-08"
+    ],
+    "overall": [
+      13.3,
+      10.3,
+      13.8,
+      10.0,
+      14.6,
+      13.8,
+      12.8,
+      9.4,
+      13.2,
+      12.6,
+      13.5,
+      18.9
+    ],
+    "by_payer": {
+      "Medicare": [
+        6.2,
+        2.1,
+        9.5,
+        5.1,
+        10.3,
+        2.6,
+        4.1,
+        6.7,
+        4.8,
+        7.9,
+        7.0,
+        9.7
+      ],
+      "Blue Cross Blue Shield": [
+        17.9,
+        10.3,
+        5.3,
+        5.6,
+        12.9,
+        8.1,
+        11.1,
+        8.0,
+        15.8,
+        15.4,
+        12.5,
+        29.0
+      ],
+      "UnitedHealthcare": [
+        20.0,
+        15.6,
+        28.1,
+        7.4,
+        13.2,
+        22.9,
+        20.7,
+        15.2,
+        33.3,
+        17.4,
+        15.4,
+        22.2
+      ],
+      "Aetna": [
+        4.5,
+        5.3,
+        19.0,
+        11.8,
+        21.4,
+        25.0,
+        4.2,
+        11.8,
+        9.5,
+        4.5,
+        17.4,
+        26.1
+      ],
+      "Medicaid": [
+        15.4,
+        21.7,
+        17.9,
+        21.7,
+        19.0,
+        18.8,
+        36.4,
+        12.5,
+        21.7,
+        18.2,
+        6.2,
+        26.3
+      ],
+      "Cigna": [
+        23.1,
+        18.2,
+        20.0,
+        5.6,
+        25.0,
+        5.3,
+        18.2,
+        6.2,
+        7.1,
+        18.2,
+        23.8,
+        12.0
+      ],
+      "Humana": [
+        0.0,
+        14.3,
+        0.0,
+        27.3,
+        12.5,
+        20.0,
+        0.0,
+        8.3,
+        0.0,
+        6.7,
+        16.7,
+        0.0
+      ],
+      "Kaiser Permanente": [
+        30.0,
+        0.0,
+        0.0,
+        11.1,
+        0.0,
+        25.0,
+        16.7,
+        0.0,
+        10.0,
+        0.0,
+        20.0,
+        0.0
+      ]
+    },
+    "counts": {
+      "overall": {
+        "adjudicated": [
+          181,
+          184,
+          203,
+          180,
+          185,
+          188,
+          180,
+          171,
+          182,
+          182,
+          170,
+          180
+        ],
+        "denied": [
+          24,
+          19,
+          28,
+          18,
+          27,
+          26,
+          23,
+          16,
+          24,
+          23,
+          23,
+          34
+        ]
+      },
+      "by_payer": {
+        "Medicare": {
+          "adjudicated": [
+            48,
+            48,
+            42,
+            39,
+            39,
+            39,
+            49,
+            45,
+            42,
+            38,
+            43,
+            31
+          ],
+          "denied": [
+            3,
+            1,
+            4,
+            2,
+            4,
+            1,
+            2,
+            3,
+            2,
+            3,
+            3,
+            3
+          ]
+        },
+        "Blue Cross Blue Shield": {
+          "adjudicated": [
+            28,
+            29,
+            38,
+            36,
+            31,
+            37,
+            27,
+            25,
+            38,
+            39,
+            24,
+            31
+          ],
+          "denied": [
+            5,
+            3,
+            2,
+            2,
+            4,
+            3,
+            3,
+            2,
+            6,
+            6,
+            3,
+            9
+          ]
+        },
+        "UnitedHealthcare": {
+          "adjudicated": [
+            35,
+            32,
+            32,
+            27,
+            38,
+            35,
+            29,
+            33,
+            21,
+            23,
+            26,
+            36
+          ],
+          "denied": [
+            7,
+            5,
+            9,
+            2,
+            5,
+            8,
+            6,
+            5,
+            7,
+            4,
+            4,
+            8
+          ]
+        },
+        "Aetna": {
+          "adjudicated": [
+            22,
+            19,
+            21,
+            17,
+            28,
+            28,
+            24,
+            17,
+            21,
+            22,
+            23,
+            23
+          ],
+          "denied": [
+            1,
+            1,
+            4,
+            2,
+            6,
+            7,
+            1,
+            2,
+            2,
+            1,
+            4,
+            6
+          ]
+        },
+        "Medicaid": {
+          "adjudicated": [
+            13,
+            23,
+            28,
+            23,
+            21,
+            16,
+            22,
+            16,
+            23,
+            22,
+            16,
+            19
+          ],
+          "denied": [
+            2,
+            5,
+            5,
+            5,
+            4,
+            3,
+            8,
+            2,
+            5,
+            4,
+            1,
+            5
+          ]
+        },
+        "Cigna": {
+          "adjudicated": [
+            13,
+            11,
+            20,
+            18,
+            12,
+            19,
+            11,
+            16,
+            14,
+            22,
+            21,
+            25
+          ],
+          "denied": [
+            3,
+            2,
+            4,
+            1,
+            3,
+            1,
+            2,
+            1,
+            1,
+            4,
+            5,
+            3
+          ]
+        },
+        "Humana": {
+          "adjudicated": [
+            12,
+            14,
+            18,
+            11,
+            8,
+            10,
+            12,
+            12,
+            13,
+            15,
+            12,
+            11
+          ],
+          "denied": [
+            0,
+            2,
+            0,
+            3,
+            1,
+            2,
+            0,
+            1,
+            0,
+            1,
+            2,
+            0
+          ]
+        },
+        "Kaiser Permanente": {
+          "adjudicated": [
+            10,
+            8,
+            4,
+            9,
+            8,
+            4,
+            6,
+            7,
+            10,
+            1,
+            5,
+            4
+          ],
+          "denied": [
+            3,
+            0,
+            0,
+            1,
+            0,
+            1,
+            1,
+            0,
+            1,
+            0,
+            1,
+            0
+          ]
+        }
+      }
+    },
+    "by_category": {
+      "Eligibility": [
+        2,
+        5,
+        4,
+        2,
+        2,
+        2,
+        4,
+        2,
+        3,
+        5,
+        4,
+        6
+      ],
+      "Coding Mismatch": [
+        3,
+        4,
+        9,
+        3,
+        5,
+        6,
+        6,
+        6,
+        4,
+        5,
+        3,
+        9
+      ],
+      "Missing Information": [
+        4,
+        3,
+        0,
+        2,
+        4,
+        4,
+        4,
+        1,
+        2,
+        1,
+        3,
+        3
+      ],
+      "Prior Authorization": [
+        4,
+        2,
+        6,
+        4,
+        8,
+        3,
+        3,
+        1,
+        7,
+        4,
+        4,
+        5
+      ],
+      "Medical Necessity": [
+        2,
+        1,
+        0,
+        3,
+        2,
+        5,
+        2,
+        4,
+        2,
+        2,
+        1,
+        5
+      ],
+      "Timely Filing": [
+        3,
+        2,
+        4,
+        2,
+        2,
+        1,
+        3,
+        1,
+        2,
+        4,
+        3,
+        2
+      ],
+      "Duplicate Claim": [
+        0,
+        0,
+        0,
+        2,
+        3,
+        2,
+        0,
+        0,
+        2,
+        1,
+        2,
+        3
+      ],
+      "Non-Covered Service": [
+        4,
+        2,
+        2,
+        0,
+        0,
+        3,
+        1,
+        0,
+        1,
+        0,
+        2,
+        1
+      ],
+      "Other": [
+        2,
+        0,
+        3,
+        0,
+        1,
+        0,
+        0,
+        1,
+        1,
+        1,
+        1,
+        0
+      ]
+    }
+  },
+  "top_codes": [
+    {
+      "code": "CO-29",
+      "category": "Timely Filing",
+      "reason": "The time limit for filing has expired",
+      "denied": 29,
+      "denied_dollars": 49052.65
+    },
+    {
+      "code": "CO-15",
+      "category": "Prior Authorization",
+      "reason": "Authorization number is missing, invalid, or does not apply",
+      "denied": 20,
+      "denied_dollars": 4260.43
+    },
+    {
+      "code": "CO-198",
+      "category": "Prior Authorization",
+      "reason": "Precertification/authorization exceeded",
+      "denied": 18,
+      "denied_dollars": 9735.14
+    },
+    {
+      "code": "CO-181",
+      "category": "Coding Mismatch",
+      "reason": "Procedure code was invalid on the date of service",
+      "denied": 16,
+      "denied_dollars": 5616.41
+    },
+    {
+      "code": "CO-16",
+      "category": "Missing Information",
+      "reason": "Claim/service lacks information or has submission/billing error(s)",
+      "denied": 14,
+      "denied_dollars": 16552.46
+    },
+    {
+      "code": "CO-11",
+      "category": "Coding Mismatch",
+      "reason": "Diagnosis is inconsistent with the procedure",
+      "denied": 14,
+      "denied_dollars": 3071.67
+    },
+    {
+      "code": "CO-182",
+      "category": "Coding Mismatch",
+      "reason": "Procedure modifier was invalid on the date of service",
+      "denied": 14,
+      "denied_dollars": 2445.93
+    },
+    {
+      "code": "CO-197",
+      "category": "Prior Authorization",
+      "reason": "Precertification/authorization/notification absent",
+      "denied": 13,
+      "denied_dollars": 4778.95
+    },
+    {
+      "code": "CO-50",
+      "category": "Medical Necessity",
+      "reason": "Non-covered services: not deemed a medical necessity by the payer",
+      "denied": 12,
+      "denied_dollars": 16589.91
+    },
+    {
+      "code": "CO-226",
+      "category": "Missing Information",
+      "reason": "Information requested from the billing/rendering provider was not provided",
+      "denied": 11,
+      "denied_dollars": 6057.25
+    }
+  ],
+  "codes_by_payer": {
+    "Medicare": [
+      {
+        "code": "CO-167",
+        "category": "Medical Necessity",
+        "reason": "This (these) diagnosis(es) is (are) not covered",
+        "denied": 3,
+        "denied_dollars": 711.28
+      },
+      {
+        "code": "CO-18",
+        "category": "Duplicate Claim",
+        "reason": "Exact duplicate claim/service",
+        "denied": 3,
+        "denied_dollars": 346.15
+      },
+      {
+        "code": "CO-146",
+        "category": "Coding Mismatch",
+        "reason": "Diagnosis was invalid for the date(s) of service reported",
+        "denied": 3,
+        "denied_dollars": 63.41
+      },
+      {
+        "code": "CO-29",
+        "category": "Timely Filing",
+        "reason": "The time limit for filing has expired",
+        "denied": 2,
+        "denied_dollars": 1201.22
+      },
+      {
+        "code": "CO-22",
+        "category": "Other",
+        "reason": "Care may be covered by another payer per coordination of benefits",
+        "denied": 2,
+        "denied_dollars": 1016.82
+      }
+    ],
+    "Blue Cross Blue Shield": [
+      {
+        "code": "CO-29",
+        "category": "Timely Filing",
+        "reason": "The time limit for filing has expired",
+        "denied": 6,
+        "denied_dollars": 14040.62
+      },
+      {
+        "code": "CO-11",
+        "category": "Coding Mismatch",
+        "reason": "Diagnosis is inconsistent with the procedure",
+        "denied": 5,
+        "denied_dollars": 1098.71
+      },
+      {
+        "code": "CO-16",
+        "category": "Missing Information",
+        "reason": "Claim/service lacks information or has submission/billing error(s)",
+        "denied": 3,
+        "denied_dollars": 13363.08
+      },
+      {
+        "code": "CO-226",
+        "category": "Missing Information",
+        "reason": "Information requested from the billing/rendering provider was not provided",
+        "denied": 3,
+        "denied_dollars": 3718.88
+      },
+      {
+        "code": "CO-15",
+        "category": "Prior Authorization",
+        "reason": "Authorization number is missing, invalid, or does not apply",
+        "denied": 3,
+        "denied_dollars": 257.59
+      }
+    ],
+    "UnitedHealthcare": [
+      {
+        "code": "CO-15",
+        "category": "Prior Authorization",
+        "reason": "Authorization number is missing, invalid, or does not apply",
+        "denied": 13,
+        "denied_dollars": 3636.13
+      },
+      {
+        "code": "CO-50",
+        "category": "Medical Necessity",
+        "reason": "Non-covered services: not deemed a medical necessity by the payer",
+        "denied": 7,
+        "denied_dollars": 11832.98
+      },
+      {
+        "code": "CO-198",
+        "category": "Prior Authorization",
+        "reason": "Precertification/authorization exceeded",
+        "denied": 7,
+        "denied_dollars": 2865.2
+      },
+      {
+        "code": "CO-197",
+        "category": "Prior Authorization",
+        "reason": "Precertification/authorization/notification absent",
+        "denied": 7,
+        "denied_dollars": 2198.49
+      },
+      {
+        "code": "CO-29",
+        "category": "Timely Filing",
+        "reason": "The time limit for filing has expired",
+        "denied": 5,
+        "denied_dollars": 18193.59
+      }
+    ],
+    "Aetna": [
+      {
+        "code": "CO-29",
+        "category": "Timely Filing",
+        "reason": "The time limit for filing has expired",
+        "denied": 4,
+        "denied_dollars": 1629.28
+      },
+      {
+        "code": "CO-200",
+        "category": "Eligibility",
+        "reason": "Expenses incurred during lapse in coverage",
+        "denied": 3,
+        "denied_dollars": 1218.82
+      },
+      {
+        "code": "CO-16",
+        "category": "Missing Information",
+        "reason": "Claim/service lacks information or has submission/billing error(s)",
+        "denied": 3,
+        "denied_dollars": 949.68
+      },
+      {
+        "code": "CO-182",
+        "category": "Coding Mismatch",
+        "reason": "Procedure modifier was invalid on the date of service",
+        "denied": 3,
+        "denied_dollars": 820.94
+      },
+      {
+        "code": "CO-226",
+        "category": "Missing Information",
+        "reason": "Information requested from the billing/rendering provider was not provided",
+        "denied": 3,
+        "denied_dollars": 310.83
+      }
+    ],
+    "Medicaid": [
+      {
+        "code": "CO-198",
+        "category": "Prior Authorization",
+        "reason": "Precertification/authorization exceeded",
+        "denied": 7,
+        "denied_dollars": 6453.69
+      },
+      {
+        "code": "CO-31",
+        "category": "Eligibility",
+        "reason": "Patient cannot be identified as our insured",
+        "denied": 5,
+        "denied_dollars": 788.46
+      },
+      {
+        "code": "CO-16",
+        "category": "Missing Information",
+        "reason": "Claim/service lacks information or has submission/billing error(s)",
+        "denied": 4,
+        "denied_dollars": 1563.7
+      },
+      {
+        "code": "CO-26",
+        "category": "Eligibility",
+        "reason": "Expenses incurred prior to coverage",
+        "denied": 4,
+        "denied_dollars": 1069.49
+      },
+      {
+        "code": "CO-177",
+        "category": "Eligibility",
+        "reason": "Patient has not met the required eligibility requirements",
+        "denied": 4,
+        "denied_dollars": 332.34
+      }
+    ],
+    "Cigna": [
+      {
+        "code": "CO-29",
+        "category": "Timely Filing",
+        "reason": "The time limit for filing has expired",
+        "denied": 8,
+        "denied_dollars": 11880.29
+      },
+      {
+        "code": "CO-181",
+        "category": "Coding Mismatch",
+        "reason": "Procedure code was invalid on the date of service",
+        "denied": 6,
+        "denied_dollars": 846.87
+      },
+      {
+        "code": "CO-182",
+        "category": "Coding Mismatch",
+        "reason": "Procedure modifier was invalid on the date of service",
+        "denied": 3,
+        "denied_dollars": 166.71
+      },
+      {
+        "code": "CO-26",
+        "category": "Eligibility",
+        "reason": "Expenses incurred prior to coverage",
+        "denied": 2,
+        "denied_dollars": 390.98
+      },
+      {
+        "code": "CO-18",
+        "category": "Duplicate Claim",
+        "reason": "Exact duplicate claim/service",
+        "denied": 2,
+        "denied_dollars": 167.97
+      }
+    ],
+    "Humana": [
+      {
+        "code": "CO-15",
+        "category": "Prior Authorization",
+        "reason": "Authorization number is missing, invalid, or does not apply",
+        "denied": 2,
+        "denied_dollars": 207.32
+      },
+      {
+        "code": "CO-181",
+        "category": "Coding Mismatch",
+        "reason": "Procedure code was invalid on the date of service",
+        "denied": 2,
+        "denied_dollars": 58.87
+      },
+      {
+        "code": "CO-29",
+        "category": "Timely Filing",
+        "reason": "The time limit for filing has expired",
+        "denied": 1,
+        "denied_dollars": 1417.0
+      },
+      {
+        "code": "CO-151",
+        "category": "Medical Necessity",
+        "reason": "Information submitted does not support this many/frequency of services",
+        "denied": 1,
+        "denied_dollars": 227.61
+      },
+      {
+        "code": "CO-182",
+        "category": "Coding Mismatch",
+        "reason": "Procedure modifier was invalid on the date of service",
+        "denied": 1,
+        "denied_dollars": 62.88
+      }
+    ],
+    "Kaiser Permanente": [
+      {
+        "code": "CO-96",
+        "category": "Non-Covered Service",
+        "reason": "Non-covered charge(s)",
+        "denied": 2,
+        "denied_dollars": 226.13
+      },
+      {
+        "code": "PR-49",
+        "category": "Non-Covered Service",
+        "reason": "Routine/preventive exam or screening procedure done with a routine exam",
+        "denied": 2,
+        "denied_dollars": 121.7
+      },
+      {
+        "code": "CO-26",
+        "category": "Eligibility",
+        "reason": "Expenses incurred prior to coverage",
+        "denied": 1,
+        "denied_dollars": 182.55
+      },
+      {
+        "code": "CO-18",
+        "category": "Duplicate Claim",
+        "reason": "Exact duplicate claim/service",
+        "denied": 1,
+        "denied_dollars": 112.62
+      },
+      {
+        "code": "PR-204",
+        "category": "Non-Covered Service",
+        "reason": "Service not covered under the patient's current benefit plan",
+        "denied": 1,
+        "denied_dollars": 100.0
+      }
+    ]
+  },
+  "by_service_line": [
+    {
+      "service_line": "Orthopedics",
+      "claims": 226,
+      "denied": 28,
+      "denial_rate": 12.4,
+      "denied_dollars": 126923.0
+    },
+    {
+      "service_line": "Cardiology",
+      "claims": 261,
+      "denied": 42,
+      "denial_rate": 16.1,
+      "denied_dollars": 23308.46
+    },
+    {
+      "service_line": "Gastroenterology",
+      "claims": 152,
+      "denied": 18,
+      "denial_rate": 11.8,
+      "denied_dollars": 21390.14
+    },
+    {
+      "service_line": "Radiology",
+      "claims": 304,
+      "denied": 41,
+      "denial_rate": 13.5,
+      "denied_dollars": 15697.64
+    },
+    {
+      "service_line": "Primary Care",
+      "claims": 779,
+      "denied": 90,
+      "denial_rate": 11.6,
+      "denied_dollars": 14832.67
+    },
+    {
+      "service_line": "Physical Therapy",
+      "claims": 225,
+      "denied": 32,
+      "denial_rate": 14.2,
+      "denied_dollars": 2858.07
+    },
+    {
+      "service_line": "Laboratory",
+      "claims": 239,
+      "denied": 34,
+      "denial_rate": 14.2,
+      "denied_dollars": 1226.45
+    }
+  ],
+  "cleaning": {
+    "source": "data/raw_claims.csv",
+    "generated": "2026-09-19",
+    "steps": [
+      {
+        "step": "Trim whitespace",
+        "rows_removed": 0,
+        "values_repaired": 731,
+        "detail": "Leading/trailing spaces removed from all text fields."
+      },
+      {
+        "step": "Remove test records",
+        "rows_removed": 20,
+        "values_repaired": 0,
+        "detail": "claim_id starting TST- or patient_id starting TEST."
+      },
+      {
+        "step": "Standardize payer names",
+        "rows_removed": 27,
+        "values_repaired": 1969,
+        "detail": "46 spelling variants collapsed to 8 payers. Dropped 27 rows whose payer was blank, N/A, UNKNOWN."
+      },
+      {
+        "step": "Parse mixed date formats",
+        "rows_removed": 0,
+        "values_repaired": 4964,
+        "detail": "ISO, MM/DD/YYYY, DD-Mon-YYYY and YYYYMMDD parsed to one date type."
+      },
+      {
+        "step": "Standardize claim status",
+        "rows_removed": 34,
+        "values_repaired": 1580,
+        "detail": "17 spellings mapped to Paid / Denied / Pending; 'Rejected' folded into Denied. 34 rows with a blank status dropped."
+      },
+      {
+        "step": "Parse billed amounts",
+        "rows_removed": 0,
+        "values_repaired": 657,
+        "detail": "Currency symbols and thousands separators removed. 24 non-positive or non-numeric amounts set to null (kept for rate metrics, excluded from dollar totals)."
+      },
+      {
+        "step": "Normalize denial codes",
+        "rows_removed": 0,
+        "values_repaired": 329,
+        "detail": "CO16, co-16, 'CO 16', 16 and CO-016 unified to GROUP-NUMBER; 22 codes without a group assumed CO; 15 stale codes on paid claims cleared."
+      },
+      {
+        "step": "Normalize CPT and ICD-10",
+        "rows_removed": 0,
+        "values_repaired": 187,
+        "detail": "Upper-cased; ICD-10 codes missing the decimal had it restored."
+      },
+      {
+        "step": "Remove duplicates",
+        "rows_removed": 107,
+        "values_repaired": 0,
+        "detail": "70 exact duplicate rows dropped. 37 resubmitted claims collapsed to their latest submission."
+      }
+    ],
+    "raw_rows": 2529,
+    "clean_rows": 2341
+  }
+}

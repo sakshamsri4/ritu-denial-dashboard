@@ -1,0 +1,155 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Cleaning log</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600&amp;family=IBM+Plex+Mono&amp;family=Instrument+Serif&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0;background:#f4f3ee;font-family:"IBM Plex Sans",system-ui,-apple-system,"Segoe UI",sans-serif;color:#141413}
+a{color:#1c5cab}a:hover{color:#104281}
+</style>
+</helmet>
+<div style="width: 1440px; height: 1200px; box-sizing: border-box; padding: 48px; display: flex; flex-direction: column; gap: 24px; background: #f4f3ee;">
+
+<header style="height: 80px; display: flex; justify-content: space-between; align-items: flex-end;">
+<div style="display: flex; flex-direction: column; gap: 6px;">
+<div style="font-size: 12px; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; color: #52514e;">Data preparation · Mock billing export</div>
+<h1 style="margin: 0; font-family: 'Instrument Serif', Georgia, serif; font-weight: 400; font-size: 44px; line-height: 1; letter-spacing: -0.01em;">From raw export to analysis-ready</h1>
+</div>
+<a href="Main.dc.html" style="font-size: 13px; font-weight: 500; text-decoration: none; border: 1px solid #d5d3ca; border-radius: 999px; padding: 12px 18px; background: #fcfcfb; color: #141413;">Back to the dashboard</a>
+</header>
+
+<section aria-label="Row counts" style="height: 100px; display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 24px;">
+<div style="background: #fcfcfb; border: 1px solid #e1e0d9; border-radius: 8px; padding: 18px 24px; box-sizing: border-box; display: flex; flex-direction: column; justify-content: space-between;">
+<div style="font-size: 13px; color: #52514e;">Raw rows in the export</div>
+<div style="font-size: 32px; font-weight: 600; line-height: 1; letter-spacing: -0.02em;">{{raw}}</div>
+<div style="font-size: 12px; color: #52514e;">15 columns · service dates {{period}}</div>
+</div>
+<div style="background: #fcfcfb; border: 1px solid #e1e0d9; border-radius: 8px; padding: 18px 24px; box-sizing: border-box; display: flex; flex-direction: column; justify-content: space-between;">
+<div style="font-size: 13px; color: #52514e;">Rows removed</div>
+<div style="font-size: 32px; font-weight: 600; line-height: 1; letter-spacing: -0.02em;">{{removed}}</div>
+<div style="font-size: 12px; color: #52514e;">test records, unmappable payers, blank status, duplicates</div>
+</div>
+<div style="background: #fcfcfb; border: 1px solid #e1e0d9; border-radius: 8px; padding: 18px 24px; box-sizing: border-box; display: flex; flex-direction: column; justify-content: space-between;">
+<div style="font-size: 13px; color: #52514e;">Values standardized</div>
+<div style="font-size: 32px; font-weight: 600; line-height: 1; letter-spacing: -0.02em;">{{repaired}}</div>
+<div style="font-size: 12px; color: #52514e;">payer names, dates, amounts, statuses, codes</div>
+</div>
+<div style="background: #fcfcfb; border: 1px solid #e1e0d9; border-radius: 8px; padding: 18px 24px; box-sizing: border-box; display: flex; flex-direction: column; justify-content: space-between;">
+<div style="font-size: 13px; color: #52514e;">Clean claims</div>
+<div style="font-size: 32px; font-weight: 600; line-height: 1; letter-spacing: -0.02em;">{{clean}}</div>
+<div style="font-size: 12px; color: #52514e;">one row per claim, latest submission wins</div>
+</div>
+</section>
+
+<section aria-label="Cleaning steps" style="height: 540px; background: #fcfcfb; border: 1px solid #e1e0d9; border-radius: 8px; padding: 20px 24px; box-sizing: border-box; display: flex; flex-direction: column; gap: 12px;">
+<div style="display: flex; justify-content: space-between; align-items: baseline;">
+<h2 style="margin: 0; font-size: 15px; font-weight: 600;">Nine cleaning steps, in the order they ran</h2>
+<div style="font-size: 12px; color: #52514e;">Source: data/raw_claims.csv · script: scripts/clean_claims.py</div>
+</div>
+<div style="display: grid; grid-template-columns: 40px 220px minmax(0, 1fr) 120px 120px; gap: 0 16px; height: 28px; align-items: end; padding-bottom: 6px; border-bottom: 1px solid #e1e0d9; font-size: 12px; color: #52514e;">
+<div>#</div>
+<div>Step</div>
+<div>What was wrong, and what changed</div>
+<div style="text-align: right;">Rows removed</div>
+<div style="text-align: right;">Values fixed</div>
+</div>
+<div style="display: flex; flex-direction: column;">
+<sc-for list="{{steps}}" as="s" hint-placeholder-count="9">
+<div style="display: grid; grid-template-columns: 40px 220px minmax(0, 1fr) 120px 120px; gap: 0 16px; align-items: center; height: 48px; border-bottom: 1px solid #efeee8;">
+<div style="font-size: 12px; color: #75746e; font-variant-numeric: tabular-nums;">{{s.n}}</div>
+<div style="font-size: 13px; font-weight: 600;">{{s.step}}</div>
+<div style="font-size: 12px; line-height: 1.3; color: #52514e;">{{s.detail}}</div>
+<div style="text-align: right; font-size: 13px; font-variant-numeric: tabular-nums;">{{s.removed}}</div>
+<div style="text-align: right; font-size: 13px; font-variant-numeric: tabular-nums;">{{s.repaired}}</div>
+</div>
+</sc-for>
+</div>
+</section>
+
+<section aria-label="Before and after examples" style="height: 200px; display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 16px;">
+<div style="background: #fcfcfb; border: 1px solid #e1e0d9; border-radius: 8px; padding: 16px 18px; box-sizing: border-box; display: flex; flex-direction: column; gap: 8px;">
+<div style="font-size: 13px; font-weight: 600;">Payer names</div>
+<div style="font-family: 'IBM Plex Mono', ui-monospace, Menlo, monospace; font-size: 12px; line-height: 1.5; color: #52514e; white-space: pre-line;">UHC
+United Healthcare
+United HealthCare Ins
+ UnitedHealthcare</div>
+<div style="font-size: 13px; font-weight: 600; margin-top: auto;">→ UnitedHealthcare</div>
+</div>
+<div style="background: #fcfcfb; border: 1px solid #e1e0d9; border-radius: 8px; padding: 16px 18px; box-sizing: border-box; display: flex; flex-direction: column; gap: 8px;">
+<div style="font-size: 13px; font-weight: 600;">Dates</div>
+<div style="font-family: 'IBM Plex Mono', ui-monospace, Menlo, monospace; font-size: 12px; line-height: 1.5; color: #52514e; white-space: pre-line;">2026-03-14
+03/14/2026
+14-Mar-2026
+20260314</div>
+<div style="font-size: 13px; font-weight: 600; margin-top: auto;">→ 2026-03-14</div>
+</div>
+<div style="background: #fcfcfb; border: 1px solid #e1e0d9; border-radius: 8px; padding: 16px 18px; box-sizing: border-box; display: flex; flex-direction: column; gap: 8px;">
+<div style="font-size: 13px; font-weight: 600;">Amounts</div>
+<div style="font-family: 'IBM Plex Mono', ui-monospace, Menlo, monospace; font-size: 12px; line-height: 1.5; color: #52514e; white-space: pre-line;">$1,250.00
+1,250.00
+1250
+N/A · -120.00 · 0.00</div>
+<div style="font-size: 13px; font-weight: 600; margin-top: auto;">→ 1250.00 · invalid → null</div>
+</div>
+<div style="background: #fcfcfb; border: 1px solid #e1e0d9; border-radius: 8px; padding: 16px 18px; box-sizing: border-box; display: flex; flex-direction: column; gap: 8px;">
+<div style="font-size: 13px; font-weight: 600;">Statuses</div>
+<div style="font-family: 'IBM Plex Mono', ui-monospace, Menlo, monospace; font-size: 12px; line-height: 1.5; color: #52514e; white-space: pre-line;">PAID · pd · Paid
+Rejected · DENIED · Deny
+In Process · Submitted
+NULL · blank</div>
+<div style="font-size: 13px; font-weight: 600; margin-top: auto;">→ Paid · Denied · Pending · dropped</div>
+</div>
+<div style="background: #fcfcfb; border: 1px solid #e1e0d9; border-radius: 8px; padding: 16px 18px; box-sizing: border-box; display: flex; flex-direction: column; gap: 8px;">
+<div style="font-size: 13px; font-weight: 600;">Denial codes</div>
+<div style="font-family: 'IBM Plex Mono', ui-monospace, Menlo, monospace; font-size: 12px; line-height: 1.5; color: #52514e; white-space: pre-line;">CO16
+co-16
+CO 16
+16 · CO-016</div>
+<div style="font-size: 13px; font-weight: 600; margin-top: auto;">→ CO-16 · Missing Information</div>
+</div>
+</section>
+
+<section aria-label="Definitions" style="height: 88px; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 24px; font-size: 13px; line-height: 1.4; color: #52514e;">
+<div><strong style="font-weight: 600; color: #141413;">Denial rate.</strong> Denied ÷ (paid + denied). Pending claims are excluded from both sides so open work never distorts the rate.</div>
+<div><strong style="font-weight: 600; color: #141413;">Rejected vs denied.</strong> Clearinghouse rejections are folded into Denied for the dashboard; the raw spelling is kept in raw_status for audit.</div>
+<div><strong style="font-weight: 600; color: #141413;">Resubmissions.</strong> A claim resubmitted after a denial counts once, by its latest outcome. The earlier denial stays in raw_claims.csv.</div>
+</section>
+
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1440,"height":1200}}'>
+const DATA = __DATA__;
+
+const fmtInt = v => v.toLocaleString('en-US');
+
+class Component extends DCLogic {
+  renderVals() {
+    const C = DATA.cleaning;
+    const removed = C.steps.reduce((s, x) => s + x.rows_removed, 0);
+    const repaired = C.steps.reduce((s, x) => s + x.values_repaired, 0);
+    const period = DATA.meta.period.replace(' to ', ' – ');
+    return {
+      raw: fmtInt(C.raw_rows),
+      removed: fmtInt(removed),
+      repaired: fmtInt(repaired),
+      clean: fmtInt(C.clean_rows),
+      period: period,
+      steps: C.steps.map((s, i) => ({
+        n: i + 1,
+        step: s.step,
+        detail: s.detail,
+        removed: s.rows_removed ? fmtInt(s.rows_removed) : '–',
+        repaired: s.values_repaired ? fmtInt(s.values_repaired) : '–',
+      })),
+    };
+  }
+}
+</script>
+</body>
+</html>

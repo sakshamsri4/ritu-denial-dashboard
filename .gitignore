@@ -1,0 +1,15 @@
+# Python
+__pycache__/
+*.pyc
+.venv/
+venv/
+
+# Streamlit secrets and local editor/tool config
+.streamlit/secrets.toml
+.claude/
+
+# Personal documents that live in this folder but are not part of the project
+cv/
+
+# OS noise
+.DS_Store

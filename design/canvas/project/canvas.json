@@ -1,0 +1,36 @@
+{
+  "v": 3,
+  "attachments": {},
+  "boards": {
+    "Main.dc.html": {
+      "x": 0,
+      "y": 0,
+      "w": 1440,
+      "h": 1724,
+      "title": "Dashboard",
+      "is_interactive": true
+    },
+    "Cleaning.dc.html": {
+      "x": 1520,
+      "y": 0,
+      "w": 1440,
+      "h": 1200,
+      "title": "Cleaning log"
+    }
+  },
+  "createdOnFiles": {
+    "at": "2026-09-19T09:26:45.800Z",
+    "v": 1
+  },
+  "designSystems": [],
+  "launch": {
+    "view": "canvas"
+  },
+  "notes": {},
+  "order": [
+    "Main.dc.html",
+    "Cleaning.dc.html"
+  ],
+  "pages": [],
+  "title": "Denial Management Dashboard"
+}

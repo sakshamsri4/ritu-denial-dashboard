@@ -1,0 +1,2071 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Denial Management Dashboard</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600&amp;family=Instrument+Serif&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0;background:#f4f3ee;font-family:"IBM Plex Sans",system-ui,-apple-system,"Segoe UI",sans-serif;color:#141413}
+a{color:#1c5cab}a:hover{color:#104281}
+button{font:inherit;color:inherit}
+button:focus-visible{outline:2px solid #2a78d6;outline-offset:2px}
+.chip{cursor:pointer}
+.chip:hover{background:#eceae3}
+.chip.on,.chip.on:hover{background:#141413;color:#fcfcfb;border-color:#141413}
+.mark{cursor:pointer}
+.mark:hover .fill,.mark:focus-visible .fill{filter:brightness(1.12)}
+.rowpick{cursor:pointer}
+.rowpick:hover{text-decoration:underline}
+.cell:hover,.cell:focus-visible{outline:2px solid #141413;outline-offset:-2px}
+</style>
+</helmet>
+<div data-root="1" style="position: relative; width: 1440px; height: 1724px; box-sizing: border-box; padding: 48px; display: flex; flex-direction: column; gap: 24px; background: #f4f3ee;">
+
+<header style="height: 80px; display: flex; justify-content: space-between; align-items: flex-end;">
+<div style="display: flex; flex-direction: column; gap: 6px;">
+<div style="font-size: 12px; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; color: #52514e;">Revenue cycle · Service dates {{period}}</div>
+<h1 style="margin: 0; font-family: 'Instrument Serif', Georgia, serif; font-weight: 400; font-size: 44px; line-height: 1; letter-spacing: -0.01em;">Denial management</h1>
+</div>
+<div style="display: flex; flex-direction: column; align-items: flex-end; gap: 6px; font-size: 13px; color: #52514e;">
+<div>Denial rate = denied ÷ (paid + denied). Pending claims excluded.</div>
+<a href="Cleaning.dc.html" style="font-weight: 500;">{{cleanRows}} claims cleaned from {{rawRows}} raw rows · see the cleaning log</a>
+</div>
+</header>
+
+<nav aria-label="Payer filter" style="height: 48px; display: flex; align-items: center; gap: 8px;">
+<span style="font-size: 13px; color: #52514e; margin-right: 4px;">Payer</span>
+<sc-for list="{{chips}}" as="chip" hint-placeholder-count="9">
+<button type="button" class="chip {{chip.cls}}" onClick="{{chip.pick}}" aria-pressed="{{chip.on}}" style="height: 44px; padding: 0 16px; border-radius: 999px; border: 1px solid #d5d3ca; background: #fcfcfb; font-size: 13px; font-weight: 500;">{{chip.label}}</button>
+</sc-for>
+</nav>
+
+<section aria-label="Key figures" style="height: 120px; display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 24px;">
+<sc-for list="{{kpis}}" as="k" hint-placeholder-count="4">
+<div style="background: #fcfcfb; border: 1px solid #e1e0d9; border-radius: 8px; padding: 20px 24px; box-sizing: border-box; display: flex; flex-direction: column; justify-content: space-between;">
+<div style="font-size: 13px; color: #52514e;">{{k.label}}</div>
+<div style="display: flex; align-items: baseline; gap: 12px;">
+<div style="font-size: 36px; font-weight: 600; line-height: 1; letter-spacing: -0.02em;">{{k.value}}</div>
+<sc-if value="{{k.hasDelta}}" hint-placeholder-val="{{false}}">
+<div style="font-size: 13px; font-weight: 500; color: {{k.deltaColor}};">{{k.delta}}</div>
+</sc-if>
+</div>
+<div style="font-size: 12px; color: #52514e;">{{k.sub}}</div>
+</div>
+</sc-for>
+</section>
+
+<section aria-label="Payers and reasons" style="height: 440px; display: flex; gap: 24px;">
+
+<div style="width: 640px; background: #fcfcfb; border: 1px solid #e1e0d9; border-radius: 8px; padding: 20px 24px; box-sizing: border-box; display: flex; flex-direction: column; gap: 16px;">
+<div style="display: flex; justify-content: space-between; align-items: baseline;">
+<h2 style="margin: 0; font-size: 15px; font-weight: 600;">Denial rate by payer</h2>
+<div style="font-size: 12px; color: #52514e;">Click a bar to filter · hairline = all-payer average {{avgRate}}</div>
+</div>
+<div style="position: relative; display: flex; flex-direction: column; gap: 6px;">
+<div style="position: absolute; left: {{avgX}}px; top: -6px; bottom: -6px; width: 1px; background: #898781;"></div>
+<sc-for list="{{payerBars}}" as="b" hint-placeholder-count="8">
+<button type="button" class="mark" onClick="{{b.pick}}" onPointerEnter="{{b.enter}}" onPointerLeave="{{hideTip}}" onFocus="{{b.enter}}" onBlur="{{hideTip}}" style="display: flex; align-items: center; gap: 12px; height: 36px; padding: 0; border: 0; background: transparent; text-align: left;">
+<span style="width: 168px; font-size: 13px; font-weight: {{b.weight}}; color: #141413; white-space: nowrap;">{{b.payer}}</span>
+<span style="width: 356px; height: 22px; position: relative;">
+<span class="fill" style="position: absolute; left: 0; top: 0; height: 22px; width: {{b.w}}px; background: {{b.color}}; border-radius: 0 4px 4px 0;"></span>
+</span>
+<span style="width: 48px; font-size: 13px; font-weight: 600; font-variant-numeric: tabular-nums; color: #141413;">{{b.rate}}</span>
+</button>
+</sc-for>
+</div>
+</div>
+
+<div style="flex-grow: 1; background: #fcfcfb; border: 1px solid #e1e0d9; border-radius: 8px; padding: 20px 24px; box-sizing: border-box; display: flex; flex-direction: column; gap: 14px;">
+<div style="display: flex; justify-content: space-between; align-items: baseline;">
+<h2 style="margin: 0; font-size: 15px; font-weight: 600;">Why claims are denied · {{scopeLabel}}</h2>
+<div style="font-size: 12px; color: #52514e;">Share of {{scopeDenied}} denials</div>
+</div>
+<div style="display: flex; flex-direction: column; gap: 4px;">
+<sc-for list="{{catBars}}" as="c" hint-placeholder-count="9">
+<button type="button" class="mark" onPointerEnter="{{c.enter}}" onPointerLeave="{{hideTip}}" onFocus="{{c.enter}}" onBlur="{{hideTip}}" style="display: flex; align-items: center; gap: 12px; height: 32px; padding: 0; border: 0; background: transparent; text-align: left; cursor: default;">
+<span style="width: 168px; font-size: 13px; color: #141413; white-space: nowrap;">{{c.category}}</span>
+<span style="width: 372px; height: 20px; position: relative;">
+<span class="fill" style="position: absolute; left: 0; top: 0; height: 20px; width: {{c.w}}px; background: #2a78d6; border-radius: 0 4px 4px 0;"></span>
+</span>
+<span style="width: 68px; font-size: 13px; font-variant-numeric: tabular-nums; color: #141413; white-space: nowrap;"><strong style="font-weight: 600;">{{c.share}}</strong> <span style="color: #52514e;">· {{c.denied}}</span></span>
+</button>
+</sc-for>
+</div>
+<div style="font-size: 12px; line-height: 1.4; color: #52514e; border-top: 1px solid #e1e0d9; padding-top: 10px; margin-top: auto;"><strong style="font-weight: 600; color: #141413;">First fix for {{topCat}}:</strong> {{topAction}}</div>
+</div>
+
+</section>
+
+<section aria-label="Payer by reason heatmap" style="height: 440px; background: #fcfcfb; border: 1px solid #e1e0d9; border-radius: 8px; padding: 20px 24px; box-sizing: border-box; display: flex; flex-direction: column; gap: 12px;">
+<div style="display: flex; justify-content: space-between; align-items: baseline;">
+<h2 style="margin: 0; font-size: 15px; font-weight: 600;">Where each payer's denial rate comes from</h2>
+<div style="display: flex; align-items: center; gap: 8px; font-size: 12px; color: #52514e;">
+<span>% of the payer's adjudicated claims denied for this reason · row adds up to the payer's denial rate</span>
+<span style="font-variant-numeric: tabular-nums;">0%</span>
+<span style="display: flex; gap: 2px;">
+<span style="width: 16px; height: 10px; background: #cde2fb;"></span>
+<span style="width: 16px; height: 10px; background: #9ec5f4;"></span>
+<span style="width: 16px; height: 10px; background: #6da7ec;"></span>
+<span style="width: 16px; height: 10px; background: #3987e5;"></span>
+<span style="width: 16px; height: 10px; background: #256abf;"></span>
+<span style="width: 16px; height: 10px; background: #1c5cab;"></span>
+<span style="width: 16px; height: 10px; background: #0d366b;"></span>
+</span>
+<span style="font-variant-numeric: tabular-nums;">{{heatMax}}</span>
+</div>
+</div>
+<div style="display: grid; grid-template-columns: 200px repeat(9, minmax(0, 1fr)) 88px; gap: 2px; align-items: end; height: 32px;">
+<div style="font-size: 12px; color: #52514e;">Payer</div>
+<sc-for list="{{catHeads}}" as="h" hint-placeholder-count="9">
+<div style="font-size: 12px; color: #52514e; text-align: center; line-height: 1.2;">{{h.label}}</div>
+</sc-for>
+<div style="font-size: 12px; color: #52514e; text-align: right;">Denial rate</div>
+</div>
+<div style="display: flex; flex-direction: column; gap: 2px;">
+<sc-for list="{{heatRows}}" as="r" hint-placeholder-count="8">
+<div style="display: grid; grid-template-columns: 200px repeat(9, minmax(0, 1fr)) 88px; gap: 2px; height: 38px;">
+<button type="button" class="rowpick" onClick="{{r.pick}}" style="display: flex; align-items: center; gap: 8px; text-align: left; font-size: 13px; font-weight: {{r.weight}}; padding: 0 8px 0 0; border: 0; background: transparent; white-space: nowrap;">
+<span style="width: 6px; height: 6px; border-radius: 50%; background: {{r.dot}};"></span>
+<span>{{r.payer}}</span>
+</button>
+<sc-for list="{{r.cells}}" as="cell" hint-placeholder-count="9">
+<button type="button" class="cell" onPointerEnter="{{cell.enter}}" onPointerLeave="{{hideTip}}" onFocus="{{cell.enter}}" onBlur="{{hideTip}}" style="border: 0; border-radius: 3px; padding: 0; background: {{cell.bg}}; color: {{cell.ink}}; font-size: 13px; font-variant-numeric: tabular-nums; display: flex; align-items: center; justify-content: center;">{{cell.text}}</button>
+</sc-for>
+<div style="font-size: 13px; font-weight: 600; font-variant-numeric: tabular-nums; display: flex; align-items: center; justify-content: flex-end;">{{r.rate}}</div>
+</div>
+</sc-for>
+</div>
+</section>
+
+<section aria-label="Trend and codes" style="height: 380px; display: flex; gap: 24px;">
+
+<div style="width: 800px; background: #fcfcfb; border: 1px solid #e1e0d9; border-radius: 8px; padding: 20px 24px; box-sizing: border-box; display: flex; flex-direction: column; gap: 12px;">
+<div style="display: flex; justify-content: space-between; align-items: baseline;">
+<h2 style="margin: 0; font-size: 15px; font-weight: 600;">Monthly denial rate by service month</h2>
+<div style="display: flex; gap: 16px; font-size: 12px; color: #52514e;">
+<span style="display: flex; align-items: center; gap: 6px;"><span style="width: 16px; height: 2px; background: #2a78d6;"></span><span>{{scopeLabel}}</span></span>
+<sc-if value="{{hasSel}}" hint-placeholder-val="{{false}}">
+<span style="display: flex; align-items: center; gap: 6px;"><span style="width: 16px; height: 2px; background: #b8b7ae;"></span><span>All payers</span></span>
+</sc-if>
+</div>
+</div>
+<svg viewBox="0 0 752 264" width="752" height="264" role="img" aria-label="Line chart of monthly denial rate" style="display: block; overflow: visible;">
+<line x1="40" x2="696" y1="{{ty0}}" y2="{{ty0}}" style="stroke: #c3c2b7; stroke-width: 1px;"></line>
+<line x1="40" x2="696" y1="{{ty1}}" y2="{{ty1}}" style="stroke: #e1e0d9; stroke-width: 1px;"></line>
+<line x1="40" x2="696" y1="{{ty2}}" y2="{{ty2}}" style="stroke: #e1e0d9; stroke-width: 1px;"></line>
+<line x1="40" x2="696" y1="{{ty3}}" y2="{{ty3}}" style="stroke: #e1e0d9; stroke-width: 1px;"></line>
+<line x1="40" x2="696" y1="{{ty4}}" y2="{{ty4}}" style="stroke: #e1e0d9; stroke-width: 1px;"></line>
+<text x="32" y="{{tt0}}" style="text-anchor: end; font-size: 11px; fill: #75746e;">{{tl0}}</text>
+<text x="32" y="{{tt1}}" style="text-anchor: end; font-size: 11px; fill: #75746e;">{{tl1}}</text>
+<text x="32" y="{{tt2}}" style="text-anchor: end; font-size: 11px; fill: #75746e;">{{tl2}}</text>
+<text x="32" y="{{tt3}}" style="text-anchor: end; font-size: 11px; fill: #75746e;">{{tl3}}</text>
+<text x="32" y="{{tt4}}" style="text-anchor: end; font-size: 11px; fill: #75746e;">{{tl4}}</text>
+<path d="{{ctxPath}}" style="fill: none; stroke: #b8b7ae; stroke-width: 2px; stroke-linejoin: round; stroke-linecap: round;"></path>
+<path d="{{mainPath}}" style="fill: none; stroke: #2a78d6; stroke-width: 2px; stroke-linejoin: round; stroke-linecap: round;"></path>
+<line x1="{{crossX}}" x2="{{crossX}}" y1="8" y2="256" style="stroke: #898781; stroke-width: 1px; opacity: {{crossOpacity}};"></line>
+<circle cx="{{crossX}}" cy="{{crossY}}" r="5" style="fill: #2a78d6; stroke: #fcfcfb; stroke-width: 2px; opacity: {{crossOpacity}};"></circle>
+<circle cx="{{endX}}" cy="{{endY}}" r="5" style="fill: #2a78d6; stroke: #fcfcfb; stroke-width: 2px;"></circle>
+<text x="{{endLabelX}}" y="{{endLabelY}}" style="font-size: 12px; font-weight: 600; fill: #141413;">{{endLabel}}</text>
+<rect x="10.2" y="0" width="59.6" height="264" onPointerEnter="{{hit0}}" onPointerLeave="{{hideTip}}" style="fill: transparent; cursor: crosshair;"></rect>
+<rect x="69.8" y="0" width="59.6" height="264" onPointerEnter="{{hit1}}" onPointerLeave="{{hideTip}}" style="fill: transparent; cursor: crosshair;"></rect>
+<rect x="129.5" y="0" width="59.6" height="264" onPointerEnter="{{hit2}}" onPointerLeave="{{hideTip}}" style="fill: transparent; cursor: crosshair;"></rect>
+<rect x="189.1" y="0" width="59.6" height="264" onPointerEnter="{{hit3}}" onPointerLeave="{{hideTip}}" style="fill: transparent; cursor: crosshair;"></rect>
+<rect x="248.7" y="0" width="59.6" height="264" onPointerEnter="{{hit4}}" onPointerLeave="{{hideTip}}" style="fill: transparent; cursor: crosshair;"></rect>
+<rect x="308.4" y="0" width="59.6" height="264" onPointerEnter="{{hit5}}" onPointerLeave="{{hideTip}}" style="fill: transparent; cursor: crosshair;"></rect>
+<rect x="368.0" y="0" width="59.6" height="264" onPointerEnter="{{hit6}}" onPointerLeave="{{hideTip}}" style="fill: transparent; cursor: crosshair;"></rect>
+<rect x="427.6" y="0" width="59.6" height="264" onPointerEnter="{{hit7}}" onPointerLeave="{{hideTip}}" style="fill: transparent; cursor: crosshair;"></rect>
+<rect x="487.3" y="0" width="59.6" height="264" onPointerEnter="{{hit8}}" onPointerLeave="{{hideTip}}" style="fill: transparent; cursor: crosshair;"></rect>
+<rect x="546.9" y="0" width="59.6" height="264" onPointerEnter="{{hit9}}" onPointerLeave="{{hideTip}}" style="fill: transparent; cursor: crosshair;"></rect>
+<rect x="606.5" y="0" width="59.6" height="264" onPointerEnter="{{hit10}}" onPointerLeave="{{hideTip}}" style="fill: transparent; cursor: crosshair;"></rect>
+<rect x="666.2" y="0" width="59.6" height="264" onPointerEnter="{{hit11}}" onPointerLeave="{{hideTip}}" style="fill: transparent; cursor: crosshair;"></rect>
+</svg>
+<div style="margin-left: 10px; width: 716px; display: flex;">
+<sc-for list="{{xLabels}}" as="x" hint-placeholder-count="12">
+<div style="flex-grow: 1; flex-basis: 0; text-align: center; font-size: 11px; color: #75746e; white-space: nowrap;">{{x.label}}</div>
+</sc-for>
+</div>
+</div>
+
+<div style="flex-grow: 1; background: #fcfcfb; border: 1px solid #e1e0d9; border-radius: 8px; padding: 20px 24px; box-sizing: border-box; display: flex; flex-direction: column; gap: 12px;">
+<div style="display: flex; justify-content: space-between; align-items: baseline;">
+<h2 style="margin: 0; font-size: 15px; font-weight: 600;">Top denial codes · {{scopeLabel}}</h2>
+<div style="font-size: 12px; color: #52514e;">CARC</div>
+</div>
+<div style="display: grid; grid-template-columns: 64px minmax(0, 1fr) 48px 64px; gap: 0 12px; font-size: 12px; color: #52514e; padding-bottom: 6px; border-bottom: 1px solid #e1e0d9;">
+<div>Code</div>
+<div>Reason</div>
+<div style="text-align: right;">Claims</div>
+<div style="text-align: right;">Billed</div>
+</div>
+<div style="display: flex; flex-direction: column;">
+<sc-for list="{{codes}}" as="k" hint-placeholder-count="5">
+<div style="display: grid; grid-template-columns: 64px minmax(0, 1fr) 48px 64px; gap: 0 12px; align-items: center; height: 52px; border-bottom: 1px solid #efeee8;">
+<div style="font-size: 13px; font-weight: 600; font-variant-numeric: tabular-nums;">{{k.code}}</div>
+<div style="display: flex; flex-direction: column; gap: 2px; min-width: 0;">
+<div style="font-size: 13px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">{{k.reason}}</div>
+<div style="font-size: 12px; color: #52514e;">{{k.category}}</div>
+</div>
+<div style="font-size: 13px; text-align: right; font-variant-numeric: tabular-nums;">{{k.denied}}</div>
+<div style="font-size: 13px; text-align: right; font-variant-numeric: tabular-nums;">{{k.dollars}}</div>
+</div>
+</sc-for>
+</div>
+</div>
+
+</section>
+
+<sc-if value="{{hasTip}}" hint-placeholder-val="{{false}}">
+<div role="tooltip" style="position: absolute; left: {{tipX}}px; top: {{tipY}}px; transform: translate(-50%, calc(-100% - 10px)); background: #141413; color: #fcfcfb; border-radius: 6px; padding: 10px 12px; font-size: 12px; line-height: 1.4; pointer-events: none; min-width: 200px; max-width: 320px; box-shadow: 0 4px 16px rgba(20, 20, 19, 0.18); z-index: 10;">
+<div style="font-weight: 600; margin-bottom: 4px;">{{tipTitle}}</div>
+<sc-for list="{{tipLines}}" as="l" hint-placeholder-count="2">
+<div style="display: flex; justify-content: space-between; gap: 16px;"><span style="color: #c3c2b7;">{{l.label}}</span><span style="font-weight: 600; font-variant-numeric: tabular-nums; white-space: nowrap;">{{l.value}}</span></div>
+</sc-for>
+</div>
+</sc-if>
+
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1440,"height":1724}}'>
+const DATA = {
+ "meta": {
+  "title": "Denial Management Dashboard",
+  "period": "2025-09-01 to 2026-08-31",
+  "rate_definition": "Denial rate = denied claims / (paid + denied claims). Pending claims excluded.",
+  "raw_rows": 2529,
+  "clean_rows": 2341
+ },
+ "kpis": {
+  "claims": 2341,
+  "adjudicated": 2186,
+  "denied": 285,
+  "pending": 155,
+  "denial_rate": 13.0,
+  "billed_total": 1650380.66,
+  "denied_dollars": 206236.43,
+  "denied_dollar_share": 12.5,
+  "appealed": 113,
+  "overturned": 51,
+  "upheld": 20,
+  "appeal_pending": 42,
+  "not_appealed": 172,
+  "period_start": "2025-09-01",
+  "period_end": "2026-08-31",
+  "overturn_rate": 71.8
+ },
+ "by_payer": [
+  {
+   "payer": "Medicaid",
+   "claims": 242,
+   "denied": 49,
+   "denial_rate": 20.2,
+   "billed": 144124.31,
+   "denied_dollars": 18603.66,
+   "top_category": "Eligibility",
+   "top_category_share": 42.9,
+   "total_claims": 262,
+   "pending": 20,
+   "appealed": 18,
+   "overturned": 7,
+   "upheld": 4,
+   "appeal_pending": 7,
+   "not_appealed": 31
+  },
+  {
+   "payer": "UnitedHealthcare",
+   "claims": 367,
+   "denied": 70,
+   "denial_rate": 19.1,
+   "billed": 240492.1,
+   "denied_dollars": 50927.48,
+   "top_category": "Prior Authorization",
+   "top_category_share": 38.6,
+   "total_claims": 397,
+   "pending": 30,
+   "appealed": 27,
+   "overturned": 11,
+   "upheld": 4,
+   "appeal_pending": 12,
+   "not_appealed": 43
+  },
+  {
+   "payer": "Cigna",
+   "claims": 202,
+   "denied": 30,
+   "denial_rate": 14.9,
+   "billed": 144333.76,
+   "denied_dollars": 17130.8,
+   "top_category": "Coding Mismatch",
+   "top_category_share": 33.3,
+   "total_claims": 215,
+   "pending": 13,
+   "appealed": 14,
+   "overturned": 8,
+   "upheld": 3,
+   "appeal_pending": 3,
+   "not_appealed": 16
+  },
+  {
+   "payer": "Aetna",
+   "claims": 265,
+   "denied": 37,
+   "denial_rate": 14.0,
+   "billed": 290065.92,
+   "denied_dollars": 42527.52,
+   "top_category": "Coding Mismatch",
+   "top_category_share": 29.7,
+   "total_claims": 284,
+   "pending": 19,
+   "appealed": 13,
+   "overturned": 7,
+   "upheld": 3,
+   "appeal_pending": 3,
+   "not_appealed": 24
+  },
+  {
+   "payer": "Blue Cross Blue Shield",
+   "claims": 383,
+   "denied": 48,
+   "denial_rate": 12.5,
+   "billed": 330773.15,
+   "denied_dollars": 48210.4,
+   "top_category": "Coding Mismatch",
+   "top_category_share": 20.8,
+   "total_claims": 406,
+   "pending": 23,
+   "appealed": 19,
+   "overturned": 8,
+   "upheld": 4,
+   "appeal_pending": 7,
+   "not_appealed": 29
+  },
+  {
+   "payer": "Kaiser Permanente",
+   "claims": 76,
+   "denied": 8,
+   "denial_rate": 10.5,
+   "billed": 46720.85,
+   "denied_dollars": 743.0,
+   "top_category": "Non-Covered Service",
+   "top_category_share": 62.5,
+   "total_claims": 80,
+   "pending": 4,
+   "appealed": 5,
+   "overturned": 4,
+   "upheld": 1,
+   "appeal_pending": 0,
+   "not_appealed": 3
+  },
+  {
+   "payer": "Humana",
+   "claims": 148,
+   "denied": 12,
+   "denial_rate": 8.1,
+   "billed": 82343.36,
+   "denied_dollars": 2122.44,
+   "top_category": "Coding Mismatch",
+   "top_category_share": 25.0,
+   "total_claims": 159,
+   "pending": 11,
+   "appealed": 5,
+   "overturned": 2,
+   "upheld": 1,
+   "appeal_pending": 2,
+   "not_appealed": 7
+  },
+  {
+   "payer": "Medicare",
+   "claims": 503,
+   "denied": 31,
+   "denial_rate": 6.2,
+   "billed": 371527.21,
+   "denied_dollars": 25971.13,
+   "top_category": "Coding Mismatch",
+   "top_category_share": 32.3,
+   "total_claims": 538,
+   "pending": 35,
+   "appealed": 12,
+   "overturned": 4,
+   "upheld": 0,
+   "appeal_pending": 8,
+   "not_appealed": 19
+  }
+ ],
+ "by_category": [
+  {
+   "category": "Eligibility",
+   "denied": 41,
+   "share": 14.4,
+   "denied_dollars": 26854.92,
+   "action": "Verify coverage at scheduling; re-check 48h before the visit."
+  },
+  {
+   "category": "Coding Mismatch",
+   "denied": 63,
+   "share": 22.1,
+   "denied_dollars": 29018.88,
+   "action": "Coder review of CPT/ICD/modifier pairing before submission."
+  },
+  {
+   "category": "Missing Information",
+   "denied": 31,
+   "share": 10.9,
+   "denied_dollars": 24700.17,
+   "action": "Front-end claim scrubber edits; attach documentation up front."
+  },
+  {
+   "category": "Prior Authorization",
+   "denied": 51,
+   "share": 17.9,
+   "denied_dollars": 18774.52,
+   "action": "Auth-required list by payer; obtain and record auth before service."
+  },
+  {
+   "category": "Medical Necessity",
+   "denied": 29,
+   "share": 10.2,
+   "denied_dollars": 23664.07,
+   "action": "Diagnosis documentation and LCD/NCD checks for high-value procedures."
+  },
+  {
+   "category": "Timely Filing",
+   "denied": 29,
+   "share": 10.2,
+   "denied_dollars": 49052.65,
+   "action": "Submission-lag alerts; work the aging queue weekly."
+  },
+  {
+   "category": "Duplicate Claim",
+   "denied": 15,
+   "share": 5.3,
+   "denied_dollars": 13493.4,
+   "action": "Suppress resubmits until the original adjudicates; fix batch logic."
+  },
+  {
+   "category": "Non-Covered Service",
+   "denied": 16,
+   "share": 5.6,
+   "denied_dollars": 13909.62,
+   "action": "Benefit check and ABN/waiver before service."
+  },
+  {
+   "category": "Other",
+   "denied": 10,
+   "share": 3.5,
+   "denied_dollars": 6768.2,
+   "action": "Route to payer-relations for COB, bundling and fee-schedule disputes."
+  }
+ ],
+ "matrix": [
+  {
+   "payer": "Medicaid",
+   "cells": [
+    {
+     "category": "Eligibility",
+     "denied": 21,
+     "pct_of_payer_denials": 42.9,
+     "pct_of_payer_claims": 8.7
+    },
+    {
+     "category": "Coding Mismatch",
+     "denied": 6,
+     "pct_of_payer_denials": 12.2,
+     "pct_of_payer_claims": 2.5
+    },
+    {
+     "category": "Missing Information",
+     "denied": 7,
+     "pct_of_payer_denials": 14.3,
+     "pct_of_payer_claims": 2.9
+    },
+    {
+     "category": "Prior Authorization",
+     "denied": 9,
+     "pct_of_payer_denials": 18.4,
+     "pct_of_payer_claims": 3.7
+    },
+    {
+     "category": "Medical Necessity",
+     "denied": 0,
+     "pct_of_payer_denials": 0.0,
+     "pct_of_payer_claims": 0.0
+    },
+    {
+     "category": "Timely Filing",
+     "denied": 3,
+     "pct_of_payer_denials": 6.1,
+     "pct_of_payer_claims": 1.2
+    },
+    {
+     "category": "Duplicate Claim",
+     "denied": 1,
+     "pct_of_payer_denials": 2.0,
+     "pct_of_payer_claims": 0.4
+    },
+    {
+     "category": "Non-Covered Service",
+     "denied": 1,
+     "pct_of_payer_denials": 2.0,
+     "pct_of_payer_claims": 0.4
+    },
+    {
+     "category": "Other",
+     "denied": 1,
+     "pct_of_payer_denials": 2.0,
+     "pct_of_payer_claims": 0.4
+    }
+   ]
+  },
+  {
+   "payer": "UnitedHealthcare",
+   "cells": [
+    {
+     "category": "Eligibility",
+     "denied": 3,
+     "pct_of_payer_denials": 4.3,
+     "pct_of_payer_claims": 0.8
+    },
+    {
+     "category": "Coding Mismatch",
+     "denied": 12,
+     "pct_of_payer_denials": 17.1,
+     "pct_of_payer_claims": 3.3
+    },
+    {
+     "category": "Missing Information",
+     "denied": 3,
+     "pct_of_payer_denials": 4.3,
+     "pct_of_payer_claims": 0.8
+    },
+    {
+     "category": "Prior Authorization",
+     "denied": 27,
+     "pct_of_payer_denials": 38.6,
+     "pct_of_payer_claims": 7.4
+    },
+    {
+     "category": "Medical Necessity",
+     "denied": 14,
+     "pct_of_payer_denials": 20.0,
+     "pct_of_payer_claims": 3.8
+    },
+    {
+     "category": "Timely Filing",
+     "denied": 5,
+     "pct_of_payer_denials": 7.1,
+     "pct_of_payer_claims": 1.4
+    },
+    {
+     "category": "Duplicate Claim",
+     "denied": 1,
+     "pct_of_payer_denials": 1.4,
+     "pct_of_payer_claims": 0.3
+    },
+    {
+     "category": "Non-Covered Service",
+     "denied": 3,
+     "pct_of_payer_denials": 4.3,
+     "pct_of_payer_claims": 0.8
+    },
+    {
+     "category": "Other",
+     "denied": 2,
+     "pct_of_payer_denials": 2.9,
+     "pct_of_payer_claims": 0.5
+    }
+   ]
+  },
+  {
+   "payer": "Cigna",
+   "cells": [
+    {
+     "category": "Eligibility",
+     "denied": 4,
+     "pct_of_payer_denials": 13.3,
+     "pct_of_payer_claims": 2.0
+    },
+    {
+     "category": "Coding Mismatch",
+     "denied": 10,
+     "pct_of_payer_denials": 33.3,
+     "pct_of_payer_claims": 5.0
+    },
+    {
+     "category": "Missing Information",
+     "denied": 1,
+     "pct_of_payer_denials": 3.3,
+     "pct_of_payer_claims": 0.5
+    },
+    {
+     "category": "Prior Authorization",
+     "denied": 3,
+     "pct_of_payer_denials": 10.0,
+     "pct_of_payer_claims": 1.5
+    },
+    {
+     "category": "Medical Necessity",
+     "denied": 0,
+     "pct_of_payer_denials": 0.0,
+     "pct_of_payer_claims": 0.0
+    },
+    {
+     "category": "Timely Filing",
+     "denied": 8,
+     "pct_of_payer_denials": 26.7,
+     "pct_of_payer_claims": 4.0
+    },
+    {
+     "category": "Duplicate Claim",
+     "denied": 3,
+     "pct_of_payer_denials": 10.0,
+     "pct_of_payer_claims": 1.5
+    },
+    {
+     "category": "Non-Covered Service",
+     "denied": 0,
+     "pct_of_payer_denials": 0.0,
+     "pct_of_payer_claims": 0.0
+    },
+    {
+     "category": "Other",
+     "denied": 1,
+     "pct_of_payer_denials": 3.3,
+     "pct_of_payer_claims": 0.5
+    }
+   ]
+  },
+  {
+   "payer": "Aetna",
+   "cells": [
+    {
+     "category": "Eligibility",
+     "denied": 4,
+     "pct_of_payer_denials": 10.8,
+     "pct_of_payer_claims": 1.5
+    },
+    {
+     "category": "Coding Mismatch",
+     "denied": 11,
+     "pct_of_payer_denials": 29.7,
+     "pct_of_payer_claims": 4.2
+    },
+    {
+     "category": "Missing Information",
+     "denied": 7,
+     "pct_of_payer_denials": 18.9,
+     "pct_of_payer_claims": 2.6
+    },
+    {
+     "category": "Prior Authorization",
+     "denied": 3,
+     "pct_of_payer_denials": 8.1,
+     "pct_of_payer_claims": 1.1
+    },
+    {
+     "category": "Medical Necessity",
+     "denied": 5,
+     "pct_of_payer_denials": 13.5,
+     "pct_of_payer_claims": 1.9
+    },
+    {
+     "category": "Timely Filing",
+     "denied": 4,
+     "pct_of_payer_denials": 10.8,
+     "pct_of_payer_claims": 1.5
+    },
+    {
+     "category": "Duplicate Claim",
+     "denied": 2,
+     "pct_of_payer_denials": 5.4,
+     "pct_of_payer_claims": 0.8
+    },
+    {
+     "category": "Non-Covered Service",
+     "denied": 1,
+     "pct_of_payer_denials": 2.7,
+     "pct_of_payer_claims": 0.4
+    },
+    {
+     "category": "Other",
+     "denied": 0,
+     "pct_of_payer_denials": 0.0,
+     "pct_of_payer_claims": 0.0
+    }
+   ]
+  },
+  {
+   "payer": "Blue Cross Blue Shield",
+   "cells": [
+    {
+     "category": "Eligibility",
+     "denied": 6,
+     "pct_of_payer_denials": 12.5,
+     "pct_of_payer_claims": 1.6
+    },
+    {
+     "category": "Coding Mismatch",
+     "denied": 10,
+     "pct_of_payer_denials": 20.8,
+     "pct_of_payer_claims": 2.6
+    },
+    {
+     "category": "Missing Information",
+     "denied": 8,
+     "pct_of_payer_denials": 16.7,
+     "pct_of_payer_claims": 2.1
+    },
+    {
+     "category": "Prior Authorization",
+     "denied": 7,
+     "pct_of_payer_denials": 14.6,
+     "pct_of_payer_claims": 1.8
+    },
+    {
+     "category": "Medical Necessity",
+     "denied": 3,
+     "pct_of_payer_denials": 6.2,
+     "pct_of_payer_claims": 0.8
+    },
+    {
+     "category": "Timely Filing",
+     "denied": 6,
+     "pct_of_payer_denials": 12.5,
+     "pct_of_payer_claims": 1.6
+    },
+    {
+     "category": "Duplicate Claim",
+     "denied": 2,
+     "pct_of_payer_denials": 4.2,
+     "pct_of_payer_claims": 0.5
+    },
+    {
+     "category": "Non-Covered Service",
+     "denied": 3,
+     "pct_of_payer_denials": 6.2,
+     "pct_of_payer_claims": 0.8
+    },
+    {
+     "category": "Other",
+     "denied": 3,
+     "pct_of_payer_denials": 6.2,
+     "pct_of_payer_claims": 0.8
+    }
+   ]
+  },
+  {
+   "payer": "Kaiser Permanente",
+   "cells": [
+    {
+     "category": "Eligibility",
+     "denied": 1,
+     "pct_of_payer_denials": 12.5,
+     "pct_of_payer_claims": 1.3
+    },
+    {
+     "category": "Coding Mismatch",
+     "denied": 1,
+     "pct_of_payer_denials": 12.5,
+     "pct_of_payer_claims": 1.3
+    },
+    {
+     "category": "Missing Information",
+     "denied": 0,
+     "pct_of_payer_denials": 0.0,
+     "pct_of_payer_claims": 0.0
+    },
+    {
+     "category": "Prior Authorization",
+     "denied": 0,
+     "pct_of_payer_denials": 0.0,
+     "pct_of_payer_claims": 0.0
+    },
+    {
+     "category": "Medical Necessity",
+     "denied": 0,
+     "pct_of_payer_denials": 0.0,
+     "pct_of_payer_claims": 0.0
+    },
+    {
+     "category": "Timely Filing",
+     "denied": 0,
+     "pct_of_payer_denials": 0.0,
+     "pct_of_payer_claims": 0.0
+    },
+    {
+     "category": "Duplicate Claim",
+     "denied": 1,
+     "pct_of_payer_denials": 12.5,
+     "pct_of_payer_claims": 1.3
+    },
+    {
+     "category": "Non-Covered Service",
+     "denied": 5,
+     "pct_of_payer_denials": 62.5,
+     "pct_of_payer_claims": 6.6
+    },
+    {
+     "category": "Other",
+     "denied": 0,
+     "pct_of_payer_denials": 0.0,
+     "pct_of_payer_claims": 0.0
+    }
+   ]
+  },
+  {
+   "payer": "Humana",
+   "cells": [
+    {
+     "category": "Eligibility",
+     "denied": 0,
+     "pct_of_payer_denials": 0.0,
+     "pct_of_payer_claims": 0.0
+    },
+    {
+     "category": "Coding Mismatch",
+     "denied": 3,
+     "pct_of_payer_denials": 25.0,
+     "pct_of_payer_claims": 2.0
+    },
+    {
+     "category": "Missing Information",
+     "denied": 1,
+     "pct_of_payer_denials": 8.3,
+     "pct_of_payer_claims": 0.7
+    },
+    {
+     "category": "Prior Authorization",
+     "denied": 2,
+     "pct_of_payer_denials": 16.7,
+     "pct_of_payer_claims": 1.4
+    },
+    {
+     "category": "Medical Necessity",
+     "denied": 3,
+     "pct_of_payer_denials": 25.0,
+     "pct_of_payer_claims": 2.0
+    },
+    {
+     "category": "Timely Filing",
+     "denied": 1,
+     "pct_of_payer_denials": 8.3,
+     "pct_of_payer_claims": 0.7
+    },
+    {
+     "category": "Duplicate Claim",
+     "denied": 1,
+     "pct_of_payer_denials": 8.3,
+     "pct_of_payer_claims": 0.7
+    },
+    {
+     "category": "Non-Covered Service",
+     "denied": 1,
+     "pct_of_payer_denials": 8.3,
+     "pct_of_payer_claims": 0.7
+    },
+    {
+     "category": "Other",
+     "denied": 0,
+     "pct_of_payer_denials": 0.0,
+     "pct_of_payer_claims": 0.0
+    }
+   ]
+  },
+  {
+   "payer": "Medicare",
+   "cells": [
+    {
+     "category": "Eligibility",
+     "denied": 2,
+     "pct_of_payer_denials": 6.5,
+     "pct_of_payer_claims": 0.4
+    },
+    {
+     "category": "Coding Mismatch",
+     "denied": 10,
+     "pct_of_payer_denials": 32.3,
+     "pct_of_payer_claims": 2.0
+    },
+    {
+     "category": "Missing Information",
+     "denied": 4,
+     "pct_of_payer_denials": 12.9,
+     "pct_of_payer_claims": 0.8
+    },
+    {
+     "category": "Prior Authorization",
+     "denied": 0,
+     "pct_of_payer_denials": 0.0,
+     "pct_of_payer_claims": 0.0
+    },
+    {
+     "category": "Medical Necessity",
+     "denied": 4,
+     "pct_of_payer_denials": 12.9,
+     "pct_of_payer_claims": 0.8
+    },
+    {
+     "category": "Timely Filing",
+     "denied": 2,
+     "pct_of_payer_denials": 6.5,
+     "pct_of_payer_claims": 0.4
+    },
+    {
+     "category": "Duplicate Claim",
+     "denied": 4,
+     "pct_of_payer_denials": 12.9,
+     "pct_of_payer_claims": 0.8
+    },
+    {
+     "category": "Non-Covered Service",
+     "denied": 2,
+     "pct_of_payer_denials": 6.5,
+     "pct_of_payer_claims": 0.4
+    },
+    {
+     "category": "Other",
+     "denied": 3,
+     "pct_of_payer_denials": 9.7,
+     "pct_of_payer_claims": 0.6
+    }
+   ]
+  }
+ ],
+ "trend": {
+  "months": [
+   "2025-09",
+   "2025-10",
+   "2025-11",
+   "2025-12",
+   "2026-01",
+   "2026-02",
+   "2026-03",
+   "2026-04",
+   "2026-05",
+   "2026-06",
+   "2026-07",
+   "2026-08"
+  ],
+  "overall": [
+   13.3,
+   10.3,
+   13.8,
+   10.0,
+   14.6,
+   13.8,
+   12.8,
+   9.4,
+   13.2,
+   12.6,
+   13.5,
+   18.9
+  ],
+  "by_payer": {
+   "Medicare": [
+    6.2,
+    2.1,
+    9.5,
+    5.1,
+    10.3,
+    2.6,
+    4.1,
+    6.7,
+    4.8,
+    7.9,
+    7.0,
+    9.7
+   ],
+   "Blue Cross Blue Shield": [
+    17.9,
+    10.3,
+    5.3,
+    5.6,
+    12.9,
+    8.1,
+    11.1,
+    8.0,
+    15.8,
+    15.4,
+    12.5,
+    29.0
+   ],
+   "UnitedHealthcare": [
+    20.0,
+    15.6,
+    28.1,
+    7.4,
+    13.2,
+    22.9,
+    20.7,
+    15.2,
+    33.3,
+    17.4,
+    15.4,
+    22.2
+   ],
+   "Aetna": [
+    4.5,
+    5.3,
+    19.0,
+    11.8,
+    21.4,
+    25.0,
+    4.2,
+    11.8,
+    9.5,
+    4.5,
+    17.4,
+    26.1
+   ],
+   "Medicaid": [
+    15.4,
+    21.7,
+    17.9,
+    21.7,
+    19.0,
+    18.8,
+    36.4,
+    12.5,
+    21.7,
+    18.2,
+    6.2,
+    26.3
+   ],
+   "Cigna": [
+    23.1,
+    18.2,
+    20.0,
+    5.6,
+    25.0,
+    5.3,
+    18.2,
+    6.2,
+    7.1,
+    18.2,
+    23.8,
+    12.0
+   ],
+   "Humana": [
+    0.0,
+    14.3,
+    0.0,
+    27.3,
+    12.5,
+    20.0,
+    0.0,
+    8.3,
+    0.0,
+    6.7,
+    16.7,
+    0.0
+   ],
+   "Kaiser Permanente": [
+    30.0,
+    0.0,
+    0.0,
+    11.1,
+    0.0,
+    25.0,
+    16.7,
+    0.0,
+    10.0,
+    0.0,
+    20.0,
+    0.0
+   ]
+  },
+  "counts": {
+   "overall": {
+    "adjudicated": [
+     181,
+     184,
+     203,
+     180,
+     185,
+     188,
+     180,
+     171,
+     182,
+     182,
+     170,
+     180
+    ],
+    "denied": [
+     24,
+     19,
+     28,
+     18,
+     27,
+     26,
+     23,
+     16,
+     24,
+     23,
+     23,
+     34
+    ]
+   },
+   "by_payer": {
+    "Medicare": {
+     "adjudicated": [
+      48,
+      48,
+      42,
+      39,
+      39,
+      39,
+      49,
+      45,
+      42,
+      38,
+      43,
+      31
+     ],
+     "denied": [
+      3,
+      1,
+      4,
+      2,
+      4,
+      1,
+      2,
+      3,
+      2,
+      3,
+      3,
+      3
+     ]
+    },
+    "Blue Cross Blue Shield": {
+     "adjudicated": [
+      28,
+      29,
+      38,
+      36,
+      31,
+      37,
+      27,
+      25,
+      38,
+      39,
+      24,
+      31
+     ],
+     "denied": [
+      5,
+      3,
+      2,
+      2,
+      4,
+      3,
+      3,
+      2,
+      6,
+      6,
+      3,
+      9
+     ]
+    },
+    "UnitedHealthcare": {
+     "adjudicated": [
+      35,
+      32,
+      32,
+      27,
+      38,
+      35,
+      29,
+      33,
+      21,
+      23,
+      26,
+      36
+     ],
+     "denied": [
+      7,
+      5,
+      9,
+      2,
+      5,
+      8,
+      6,
+      5,
+      7,
+      4,
+      4,
+      8
+     ]
+    },
+    "Aetna": {
+     "adjudicated": [
+      22,
+      19,
+      21,
+      17,
+      28,
+      28,
+      24,
+      17,
+      21,
+      22,
+      23,
+      23
+     ],
+     "denied": [
+      1,
+      1,
+      4,
+      2,
+      6,
+      7,
+      1,
+      2,
+      2,
+      1,
+      4,
+      6
+     ]
+    },
+    "Medicaid": {
+     "adjudicated": [
+      13,
+      23,
+      28,
+      23,
+      21,
+      16,
+      22,
+      16,
+      23,
+      22,
+      16,
+      19
+     ],
+     "denied": [
+      2,
+      5,
+      5,
+      5,
+      4,
+      3,
+      8,
+      2,
+      5,
+      4,
+      1,
+      5
+     ]
+    },
+    "Cigna": {
+     "adjudicated": [
+      13,
+      11,
+      20,
+      18,
+      12,
+      19,
+      11,
+      16,
+      14,
+      22,
+      21,
+      25
+     ],
+     "denied": [
+      3,
+      2,
+      4,
+      1,
+      3,
+      1,
+      2,
+      1,
+      1,
+      4,
+      5,
+      3
+     ]
+    },
+    "Humana": {
+     "adjudicated": [
+      12,
+      14,
+      18,
+      11,
+      8,
+      10,
+      12,
+      12,
+      13,
+      15,
+      12,
+      11
+     ],
+     "denied": [
+      0,
+      2,
+      0,
+      3,
+      1,
+      2,
+      0,
+      1,
+      0,
+      1,
+      2,
+      0
+     ]
+    },
+    "Kaiser Permanente": {
+     "adjudicated": [
+      10,
+      8,
+      4,
+      9,
+      8,
+      4,
+      6,
+      7,
+      10,
+      1,
+      5,
+      4
+     ],
+     "denied": [
+      3,
+      0,
+      0,
+      1,
+      0,
+      1,
+      1,
+      0,
+      1,
+      0,
+      1,
+      0
+     ]
+    }
+   }
+  },
+  "by_category": {
+   "Eligibility": [
+    2,
+    5,
+    4,
+    2,
+    2,
+    2,
+    4,
+    2,
+    3,
+    5,
+    4,
+    6
+   ],
+   "Coding Mismatch": [
+    3,
+    4,
+    9,
+    3,
+    5,
+    6,
+    6,
+    6,
+    4,
+    5,
+    3,
+    9
+   ],
+   "Missing Information": [
+    4,
+    3,
+    0,
+    2,
+    4,
+    4,
+    4,
+    1,
+    2,
+    1,
+    3,
+    3
+   ],
+   "Prior Authorization": [
+    4,
+    2,
+    6,
+    4,
+    8,
+    3,
+    3,
+    1,
+    7,
+    4,
+    4,
+    5
+   ],
+   "Medical Necessity": [
+    2,
+    1,
+    0,
+    3,
+    2,
+    5,
+    2,
+    4,
+    2,
+    2,
+    1,
+    5
+   ],
+   "Timely Filing": [
+    3,
+    2,
+    4,
+    2,
+    2,
+    1,
+    3,
+    1,
+    2,
+    4,
+    3,
+    2
+   ],
+   "Duplicate Claim": [
+    0,
+    0,
+    0,
+    2,
+    3,
+    2,
+    0,
+    0,
+    2,
+    1,
+    2,
+    3
+   ],
+   "Non-Covered Service": [
+    4,
+    2,
+    2,
+    0,
+    0,
+    3,
+    1,
+    0,
+    1,
+    0,
+    2,
+    1
+   ],
+   "Other": [
+    2,
+    0,
+    3,
+    0,
+    1,
+    0,
+    0,
+    1,
+    1,
+    1,
+    1,
+    0
+   ]
+  }
+ },
+ "top_codes": [
+  {
+   "code": "CO-29",
+   "category": "Timely Filing",
+   "reason": "The time limit for filing has expired",
+   "denied": 29,
+   "denied_dollars": 49052.65
+  },
+  {
+   "code": "CO-15",
+   "category": "Prior Authorization",
+   "reason": "Authorization number is missing, invalid, or does not apply",
+   "denied": 20,
+   "denied_dollars": 4260.43
+  },
+  {
+   "code": "CO-198",
+   "category": "Prior Authorization",
+   "reason": "Precertification/authorization exceeded",
+   "denied": 18,
+   "denied_dollars": 9735.14
+  },
+  {
+   "code": "CO-181",
+   "category": "Coding Mismatch",
+   "reason": "Procedure code was invalid on the date of service",
+   "denied": 16,
+   "denied_dollars": 5616.41
+  },
+  {
+   "code": "CO-16",
+   "category": "Missing Information",
+   "reason": "Claim/service lacks information or has submission/billing error(s)",
+   "denied": 14,
+   "denied_dollars": 16552.46
+  },
+  {
+   "code": "CO-11",
+   "category": "Coding Mismatch",
+   "reason": "Diagnosis is inconsistent with the procedure",
+   "denied": 14,
+   "denied_dollars": 3071.67
+  },
+  {
+   "code": "CO-182",
+   "category": "Coding Mismatch",
+   "reason": "Procedure modifier was invalid on the date of service",
+   "denied": 14,
+   "denied_dollars": 2445.93
+  },
+  {
+   "code": "CO-197",
+   "category": "Prior Authorization",
+   "reason": "Precertification/authorization/notification absent",
+   "denied": 13,
+   "denied_dollars": 4778.95
+  },
+  {
+   "code": "CO-50",
+   "category": "Medical Necessity",
+   "reason": "Non-covered services: not deemed a medical necessity by the payer",
+   "denied": 12,
+   "denied_dollars": 16589.91
+  },
+  {
+   "code": "CO-226",
+   "category": "Missing Information",
+   "reason": "Information requested from the billing/rendering provider was not provided",
+   "denied": 11,
+   "denied_dollars": 6057.25
+  }
+ ],
+ "codes_by_payer": {
+  "Medicare": [
+   {
+    "code": "CO-167",
+    "category": "Medical Necessity",
+    "reason": "This (these) diagnosis(es) is (are) not covered",
+    "denied": 3,
+    "denied_dollars": 711.28
+   },
+   {
+    "code": "CO-18",
+    "category": "Duplicate Claim",
+    "reason": "Exact duplicate claim/service",
+    "denied": 3,
+    "denied_dollars": 346.15
+   },
+   {
+    "code": "CO-146",
+    "category": "Coding Mismatch",
+    "reason": "Diagnosis was invalid for the date(s) of service reported",
+    "denied": 3,
+    "denied_dollars": 63.41
+   },
+   {
+    "code": "CO-29",
+    "category": "Timely Filing",
+    "reason": "The time limit for filing has expired",
+    "denied": 2,
+    "denied_dollars": 1201.22
+   },
+   {
+    "code": "CO-22",
+    "category": "Other",
+    "reason": "Care may be covered by another payer per coordination of benefits",
+    "denied": 2,
+    "denied_dollars": 1016.82
+   }
+  ],
+  "Blue Cross Blue Shield": [
+   {
+    "code": "CO-29",
+    "category": "Timely Filing",
+    "reason": "The time limit for filing has expired",
+    "denied": 6,
+    "denied_dollars": 14040.62
+   },
+   {
+    "code": "CO-11",
+    "category": "Coding Mismatch",
+    "reason": "Diagnosis is inconsistent with the procedure",
+    "denied": 5,
+    "denied_dollars": 1098.71
+   },
+   {
+    "code": "CO-16",
+    "category": "Missing Information",
+    "reason": "Claim/service lacks information or has submission/billing error(s)",
+    "denied": 3,
+    "denied_dollars": 13363.08
+   },
+   {
+    "code": "CO-226",
+    "category": "Missing Information",
+    "reason": "Information requested from the billing/rendering provider was not provided",
+    "denied": 3,
+    "denied_dollars": 3718.88
+   },
+   {
+    "code": "CO-15",
+    "category": "Prior Authorization",
+    "reason": "Authorization number is missing, invalid, or does not apply",
+    "denied": 3,
+    "denied_dollars": 257.59
+   }
+  ],
+  "UnitedHealthcare": [
+   {
+    "code": "CO-15",
+    "category": "Prior Authorization",
+    "reason": "Authorization number is missing, invalid, or does not apply",
+    "denied": 13,
+    "denied_dollars": 3636.13
+   },
+   {
+    "code": "CO-50",
+    "category": "Medical Necessity",
+    "reason": "Non-covered services: not deemed a medical necessity by the payer",
+    "denied": 7,
+    "denied_dollars": 11832.98
+   },
+   {
+    "code": "CO-198",
+    "category": "Prior Authorization",
+    "reason": "Precertification/authorization exceeded",
+    "denied": 7,
+    "denied_dollars": 2865.2
+   },
+   {
+    "code": "CO-197",
+    "category": "Prior Authorization",
+    "reason": "Precertification/authorization/notification absent",
+    "denied": 7,
+    "denied_dollars": 2198.49
+   },
+   {
+    "code": "CO-29",
+    "category": "Timely Filing",
+    "reason": "The time limit for filing has expired",
+    "denied": 5,
+    "denied_dollars": 18193.59
+   }
+  ],
+  "Aetna": [
+   {
+    "code": "CO-29",
+    "category": "Timely Filing",
+    "reason": "The time limit for filing has expired",
+    "denied": 4,
+    "denied_dollars": 1629.28
+   },
+   {
+    "code": "CO-200",
+    "category": "Eligibility",
+    "reason": "Expenses incurred during lapse in coverage",
+    "denied": 3,
+    "denied_dollars": 1218.82
+   },
+   {
+    "code": "CO-16",
+    "category": "Missing Information",
+    "reason": "Claim/service lacks information or has submission/billing error(s)",
+    "denied": 3,
+    "denied_dollars": 949.68
+   },
+   {
+    "code": "CO-182",
+    "category": "Coding Mismatch",
+    "reason": "Procedure modifier was invalid on the date of service",
+    "denied": 3,
+    "denied_dollars": 820.94
+   },
+   {
+    "code": "CO-226",
+    "category": "Missing Information",
+    "reason": "Information requested from the billing/rendering provider was not provided",
+    "denied": 3,
+    "denied_dollars": 310.83
+   }
+  ],
+  "Medicaid": [
+   {
+    "code": "CO-198",
+    "category": "Prior Authorization",
+    "reason": "Precertification/authorization exceeded",
+    "denied": 7,
+    "denied_dollars": 6453.69
+   },
+   {
+    "code": "CO-31",
+    "category": "Eligibility",
+    "reason": "Patient cannot be identified as our insured",
+    "denied": 5,
+    "denied_dollars": 788.46
+   },
+   {
+    "code": "CO-16",
+    "category": "Missing Information",
+    "reason": "Claim/service lacks information or has submission/billing error(s)",
+    "denied": 4,
+    "denied_dollars": 1563.7
+   },
+   {
+    "code": "CO-26",
+    "category": "Eligibility",
+    "reason": "Expenses incurred prior to coverage",
+    "denied": 4,
+    "denied_dollars": 1069.49
+   },
+   {
+    "code": "CO-177",
+    "category": "Eligibility",
+    "reason": "Patient has not met the required eligibility requirements",
+    "denied": 4,
+    "denied_dollars": 332.34
+   }
+  ],
+  "Cigna": [
+   {
+    "code": "CO-29",
+    "category": "Timely Filing",
+    "reason": "The time limit for filing has expired",
+    "denied": 8,
+    "denied_dollars": 11880.29
+   },
+   {
+    "code": "CO-181",
+    "category": "Coding Mismatch",
+    "reason": "Procedure code was invalid on the date of service",
+    "denied": 6,
+    "denied_dollars": 846.87
+   },
+   {
+    "code": "CO-182",
+    "category": "Coding Mismatch",
+    "reason": "Procedure modifier was invalid on the date of service",
+    "denied": 3,
+    "denied_dollars": 166.71
+   },
+   {
+    "code": "CO-26",
+    "category": "Eligibility",
+    "reason": "Expenses incurred prior to coverage",
+    "denied": 2,
+    "denied_dollars": 390.98
+   },
+   {
+    "code": "CO-18",
+    "category": "Duplicate Claim",
+    "reason": "Exact duplicate claim/service",
+    "denied": 2,
+    "denied_dollars": 167.97
+   }
+  ],
+  "Humana": [
+   {
+    "code": "CO-15",
+    "category": "Prior Authorization",
+    "reason": "Authorization number is missing, invalid, or does not apply",
+    "denied": 2,
+    "denied_dollars": 207.32
+   },
+   {
+    "code": "CO-181",
+    "category": "Coding Mismatch",
+    "reason": "Procedure code was invalid on the date of service",
+    "denied": 2,
+    "denied_dollars": 58.87
+   },
+   {
+    "code": "CO-29",
+    "category": "Timely Filing",
+    "reason": "The time limit for filing has expired",
+    "denied": 1,
+    "denied_dollars": 1417.0
+   },
+   {
+    "code": "CO-151",
+    "category": "Medical Necessity",
+    "reason": "Information submitted does not support this many/frequency of services",
+    "denied": 1,
+    "denied_dollars": 227.61
+   },
+   {
+    "code": "CO-182",
+    "category": "Coding Mismatch",
+    "reason": "Procedure modifier was invalid on the date of service",
+    "denied": 1,
+    "denied_dollars": 62.88
+   }
+  ],
+  "Kaiser Permanente": [
+   {
+    "code": "CO-96",
+    "category": "Non-Covered Service",
+    "reason": "Non-covered charge(s)",
+    "denied": 2,
+    "denied_dollars": 226.13
+   },
+   {
+    "code": "PR-49",
+    "category": "Non-Covered Service",
+    "reason": "Routine/preventive exam or screening procedure done with a routine exam",
+    "denied": 2,
+    "denied_dollars": 121.7
+   },
+   {
+    "code": "CO-26",
+    "category": "Eligibility",
+    "reason": "Expenses incurred prior to coverage",
+    "denied": 1,
+    "denied_dollars": 182.55
+   },
+   {
+    "code": "CO-18",
+    "category": "Duplicate Claim",
+    "reason": "Exact duplicate claim/service",
+    "denied": 1,
+    "denied_dollars": 112.62
+   },
+   {
+    "code": "PR-204",
+    "category": "Non-Covered Service",
+    "reason": "Service not covered under the patient's current benefit plan",
+    "denied": 1,
+    "denied_dollars": 100.0
+   }
+  ]
+ }
+};
+
+const RAMP = ['#cde2fb', '#9ec5f4', '#6da7ec', '#3987e5', '#256abf', '#1c5cab', '#0d366b'];
+const SHORT = {
+  'Eligibility': 'Eligibility', 'Coding Mismatch': 'Coding mismatch', 'Missing Information': 'Missing info',
+  'Prior Authorization': 'Prior auth', 'Medical Necessity': 'Medical necessity', 'Timely Filing': 'Timely filing',
+  'Duplicate Claim': 'Duplicate', 'Non-Covered Service': 'Non-covered', 'Other': 'Other'
+};
+const MONTHS = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+const MONTHS_LONG = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
+const PLOT = { x0: 40, x1: 696, y0: 8, y1: 256 };
+const TRACK = 356;
+
+const fmtPct = v => v.toFixed(1) + '%';
+const fmtInt = v => v.toLocaleString('en-US');
+const fmtMoney = v => v >= 1e6 ? '$' + (v / 1e6).toFixed(2) + 'M'
+  : v >= 1e3 ? '$' + Math.round(v / 1e3).toLocaleString('en-US') + 'K'
+  : '$' + Math.round(v);
+
+class Component extends DCLogic {
+  constructor(props) {
+    super(props);
+    this.state = { payer: null, tip: null, cross: -1 };
+  }
+
+  select(p) {
+    this.setState({ payer: this.state.payer === p ? null : p });
+  }
+
+  tipAt(e, title, lines, cross) {
+    const el = e.currentTarget;
+    const root = el && el.closest ? el.closest('[data-root]') : null;
+    if (!root) return;
+    const rr = root.getBoundingClientRect();
+    const r = el.getBoundingClientRect();
+    const x = Math.max(160, Math.min(rr.width - 160, r.left - rr.left + r.width / 2));
+    this.setState({ tip: { title, lines, x, y: r.top - rr.top }, cross: cross === undefined ? -1 : cross });
+  }
+
+  hide() {
+    if (this.state.tip || this.state.cross >= 0) this.setState({ tip: null, cross: -1 });
+  }
+
+  renderVals() {
+    const D = DATA, K = D.kpis, T = D.trend;
+    const sel = this.state.payer, tip = this.state.tip, cross = this.state.cross;
+    const payers = D.by_payer;
+    const P = sel ? payers.find(p => p.payer === sel) : null;
+    const scopeLabel = sel || 'All payers';
+    const hideTip = () => this.hide();
+
+    // ---- key figures for the current scope
+    const n = T.months.length, half = Math.floor(n / 2);
+    const cnt = sel ? T.counts.by_payer[sel] : T.counts.overall;
+    const rateOver = (from, to) => {
+      let d = 0, a = 0;
+      for (let i = from; i < to; i++) { d += cnt.denied[i]; a += cnt.adjudicated[i]; }
+      return a ? 100 * d / a : 0;
+    };
+    const delta = rateOver(half, n) - rateOver(0, half);
+    const S = P ? {
+      adjudicated: P.claims, denied: P.denied, rate: P.denial_rate, total: P.total_claims, pending: P.pending,
+      billed: P.billed, deniedDollars: P.denied_dollars,
+      overturned: P.overturned, upheld: P.upheld, open: P.appeal_pending, notAppealed: P.not_appealed
+    } : {
+      adjudicated: K.adjudicated, denied: K.denied, rate: K.denial_rate, total: K.claims, pending: K.pending,
+      billed: K.billed_total, deniedDollars: K.denied_dollars,
+      overturned: K.overturned, upheld: K.upheld, open: K.appeal_pending, notAppealed: K.not_appealed
+    };
+    const decided = S.overturned + S.upheld;
+    const kpis = [
+      {
+        label: 'Denial rate', value: fmtPct(S.rate), hasDelta: true,
+        delta: (delta >= 0 ? '+' : '−') + Math.abs(delta).toFixed(1) + ' pts, second half vs first',
+        deltaColor: delta > 0 ? '#b3261e' : '#006300',
+        sub: fmtInt(S.denied) + ' of ' + fmtInt(S.adjudicated) + ' adjudicated claims'
+      },
+      {
+        label: 'Denied claims', value: fmtInt(S.denied), hasDelta: false, delta: '', deltaColor: '#141413',
+        sub: fmtInt(S.pending) + ' still pending · ' + fmtInt(S.total) + ' claims in scope'
+      },
+      {
+        label: 'Denied dollars', value: fmtMoney(S.deniedDollars), hasDelta: false, delta: '', deltaColor: '#141413',
+        sub: fmtPct(S.billed ? 100 * S.deniedDollars / S.billed : 0) + ' of ' + fmtMoney(S.billed) + ' billed'
+      },
+      {
+        label: 'Appeal overturn rate', value: decided ? fmtPct(100 * S.overturned / decided) : '–', hasDelta: false, delta: '', deltaColor: '#141413',
+        sub: S.overturned + ' overturned · ' + S.upheld + ' upheld · ' + S.open + ' open · ' + S.notAppealed + ' not appealed'
+      }
+    ];
+
+    // ---- payer filter chips (same order as the bars)
+    const chips = [{ label: 'All payers', on: !sel, cls: !sel ? 'on' : '', pick: () => this.setState({ payer: null }) }]
+      .concat(payers.map(p => ({ label: p.payer, on: sel === p.payer, cls: sel === p.payer ? 'on' : '', pick: () => this.select(p.payer) })));
+
+    // ---- denial rate by payer
+    const maxRate = Math.max(25, Math.ceil(Math.max.apply(null, payers.map(p => p.denial_rate)) * 1.15 / 5) * 5);
+    const payerBars = payers.map(p => ({
+      payer: p.payer,
+      rate: fmtPct(p.denial_rate),
+      w: Math.max(2, Math.round(p.denial_rate / maxRate * TRACK)),
+      color: !sel || sel === p.payer ? '#2a78d6' : '#cfcec5',
+      weight: sel === p.payer ? 600 : 400,
+      pick: () => this.select(p.payer),
+      enter: e => this.tipAt(e, p.payer, [
+        { label: 'Denial rate', value: fmtPct(p.denial_rate) },
+        { label: 'Denied / adjudicated', value: fmtInt(p.denied) + ' / ' + fmtInt(p.claims) },
+        { label: 'Denied dollars', value: fmtMoney(p.denied_dollars) },
+        { label: 'Top reason', value: p.top_category + ' (' + fmtPct(p.top_category_share) + ')' }
+      ])
+    }));
+    const avgX = 180 + Math.round(K.denial_rate / maxRate * TRACK);
+
+    // ---- why claims are denied, for the current scope
+    const row = sel ? D.matrix.find(r => r.payer === sel) : null;
+    const cats = (row
+      ? row.cells.map(c => ({ category: c.category, denied: c.denied, share: c.pct_of_payer_denials }))
+      : D.by_category.map(c => ({ category: c.category, denied: c.denied, share: c.share })))
+      .sort((a, b) => b.denied - a.denied || a.category.localeCompare(b.category));
+    const maxShare = Math.max(1, Math.max.apply(null, cats.map(c => c.share)));
+    const actions = {};
+    D.by_category.forEach(c => { actions[c.category] = c.action; });
+    const catBars = cats.map(c => ({
+      category: c.category,
+      denied: fmtInt(c.denied),
+      share: fmtPct(c.share),
+      w: Math.round(c.share / maxShare * 340),
+      enter: e => this.tipAt(e, c.category + ' · ' + scopeLabel, [
+        { label: 'Denied claims', value: fmtInt(c.denied) },
+        { label: 'Share of denials', value: fmtPct(c.share) }
+      ])
+    }));
+    const topCat = cats[0].category;
+
+    // ---- payer x reason heatmap (all payers; the selected row is marked)
+    let heatMax = 0;
+    D.matrix.forEach(r => r.cells.forEach(c => { heatMax = Math.max(heatMax, c.pct_of_payer_claims); }));
+    const catHeads = D.by_category.map(c => ({ label: SHORT[c.category] || c.category }));
+    const heatRows = D.matrix.map(r => {
+      const p = payers.find(x => x.payer === r.payer);
+      return {
+        payer: r.payer,
+        rate: fmtPct(p ? p.denial_rate : 0),
+        weight: sel === r.payer ? 600 : 400,
+        dot: sel === r.payer ? '#2a78d6' : 'transparent',
+        pick: () => this.select(r.payer),
+        cells: r.cells.map(c => {
+          const v = c.pct_of_payer_claims;
+          const idx = v > 0 ? Math.min(RAMP.length - 1, Math.ceil(v / heatMax * RAMP.length) - 1) : -1;
+          return {
+            text: v > 0 ? v.toFixed(1) : '–',
+            bg: idx < 0 ? '#f0efec' : RAMP[idx],
+            ink: idx < 0 ? '#75746e' : idx <= 3 ? '#141413' : '#ffffff',
+            enter: e => this.tipAt(e, r.payer + ' · ' + c.category, [
+              { label: 'Denied claims', value: fmtInt(c.denied) },
+              { label: 'Share of this payer’s denials', value: fmtPct(c.pct_of_payer_denials) },
+              { label: 'Share of this payer’s claims', value: fmtPct(v) }
+            ])
+          };
+        })
+      };
+    });
+
+    // ---- monthly trend: the scope in blue, all payers as grey context when a payer is selected
+    const main = sel ? T.by_payer[sel] : T.overall;
+    const ctx = sel ? T.overall : null;
+    const yMax = Math.max(40, Math.ceil(Math.max.apply(null, main.concat(ctx || [0])) / 10) * 10);
+    const X = i => PLOT.x0 + i * (PLOT.x1 - PLOT.x0) / (n - 1);
+    const Y = v => PLOT.y1 - v / yMax * (PLOT.y1 - PLOT.y0);
+    const path = arr => arr.map((v, i) => (i ? 'L' : 'M') + X(i).toFixed(1) + ' ' + Y(v).toFixed(1)).join(' ');
+    const ticks = {};
+    for (let k = 0; k < 5; k++) {
+      const t = yMax / 4 * k;
+      ticks['ty' + k] = Y(t).toFixed(1);
+      ticks['tt' + k] = (Y(t) + 4).toFixed(1);
+      ticks['tl' + k] = Math.round(t) + '%';
+    }
+    const xLabels = T.months.map((ym, i) => {
+      const parts = ym.split('-'), mi = +parts[1] - 1;
+      return { label: MONTHS[mi] + (i === 0 || mi === 0 ? ' ’' + parts[0].slice(2) : '') };
+    });
+    const hits = {};
+    T.months.forEach((ym, i) => {
+      hits['hit' + i] = e => {
+        const parts = ym.split('-');
+        const lines = [{ label: scopeLabel, value: fmtPct(main[i]) }];
+        if (ctx) lines.push({ label: 'All payers', value: fmtPct(ctx[i]) });
+        lines.push({ label: 'Adjudicated claims', value: fmtInt(cnt.adjudicated[i]) + ' (' + fmtInt(cnt.denied[i]) + ' denied)' });
+        this.tipAt(e, MONTHS_LONG[+parts[1] - 1] + ' ' + parts[0], lines, i);
+      };
+    });
+    const last = n - 1;
+
+    // ---- top denial codes for the current scope
+    const codes = (sel ? D.codes_by_payer[sel] : D.top_codes).slice(0, 5).map(k => ({
+      code: k.code, reason: k.reason, category: k.category, denied: fmtInt(k.denied), dollars: fmtMoney(k.denied_dollars)
+    }));
+
+    return Object.assign({
+      period: D.meta.period.replace(' to ', ' – '),
+      cleanRows: fmtInt(D.meta.clean_rows), rawRows: fmtInt(D.meta.raw_rows),
+      chips, kpis,
+      payerBars, avgX, avgRate: fmtPct(K.denial_rate),
+      catBars, scopeLabel, scopeDenied: fmtInt(S.denied), topCat, topAction: actions[topCat] || '',
+      heatMax: fmtPct(heatMax), catHeads, heatRows,
+      hasSel: !!sel, mainPath: path(main), ctxPath: ctx ? path(ctx) : '',
+      endX: X(last).toFixed(1), endY: Y(main[last]).toFixed(1), endLabel: fmtPct(main[last]),
+      endLabelX: (X(last) + 10).toFixed(1), endLabelY: (Y(main[last]) + 4).toFixed(1),
+      crossX: cross >= 0 ? X(cross).toFixed(1) : -100, crossY: cross >= 0 ? Y(main[cross]).toFixed(1) : -100,
+      crossOpacity: cross >= 0 ? 1 : 0,
+      xLabels, codes,
+      hasTip: !!tip, tipX: tip ? tip.x : 0, tipY: tip ? tip.y : 0, tipTitle: tip ? tip.title : '', tipLines: tip ? tip.lines : [],
+      hideTip
+    }, ticks, hits);
+  }
+}
+</script>
+</body>
+</html>
