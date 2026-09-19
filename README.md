@@ -46,6 +46,8 @@ databases to configure because all data is generated in memory.
 | `denial_dashboard/training.py` | Training companion text and the live insight generator |
 | `denial_dashboard/sql_lab.py` | SQL Lab engine: in-memory SQLite practice database, twelve lessons, read-only query runner, answer checker |
 | `denial_dashboard/sql_lab_ui.py` | The SQL Lab tab: lesson navigation, editor, hints, progress, sandbox |
+| `denial_dashboard/sql_drills.py` | Question templates that generate practice tests: 5 to 12 templates per lesson, filled from the data, giving dozens of distinct questions each |
+| `denial_dashboard/sql_practice_ui.py` | The practice-test panel inside each lesson: one question at a time, check, hints, skip, score, retry the missed ones |
 | `.streamlit/config.toml` | Theme (blues and cool greys) and toolbar settings |
 
 The **SQL Lab** tab teaches SQL step by step on the same claims: SELECT, WHERE,
@@ -54,6 +56,12 @@ functions, and a capstone that rebuilds the top-five-payers report. Each lesson
 has worked examples with live output, a fill-in-the-blanks challenge, two hints,
 a solution with its pandas twin, and a checker that compares your result to the
 target and says what differs. A read-only sandbox sits under the lessons.
+
+Under every lesson there is a **practice test**: pick 10, 20, 30 or 50 questions and
+the lab generates them from the data (a different payer, account, threshold or month
+each time), grades each answer, offers two hints and the solution, keeps score, and at
+the end lists the questions you missed with their solutions so you can retry just
+those. "Mix in earlier lessons" turns it into a cumulative test.
 
 Metric definitions used by the app:
 

@@ -8,6 +8,8 @@ Four small modules, each with one job, so the code reads like the analysis does:
   training.py  the "Analyst Training Companion": narrative, live insights, SQL
   sql_lab.py   the SQL Lab engine: practice database, twelve lessons, query runner, checker
   sql_lab_ui.py the SQL Lab tab drawn with Streamlit
+  sql_drills.py question templates that generate practice tests (dozens of questions per lesson)
+  sql_practice_ui.py the practice-test panel inside each lesson
 
 app.py at the project root wires them into the Streamlit page.
 """

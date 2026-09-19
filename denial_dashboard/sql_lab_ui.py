@@ -15,7 +15,7 @@ import inspect
 
 import streamlit as st
 
-from . import sql_lab
+from . import sql_lab, sql_practice_ui
 
 # Newer Streamlit takes width="stretch" on buttons; older takes use_container_width=True.
 _WIDE_BUTTON = ({"width": "stretch"} if "width" in inspect.signature(st.button).parameters
@@ -172,6 +172,9 @@ def render(con, show_table) -> None:
             if lesson.pandas:
                 with st.expander("The same idea in pandas"):
                     st.code(lesson.pandas, language="python")
+
+        st.markdown("---")
+        sql_practice_ui.render_practice(con, lesson, ids, idx, show_table)
 
     st.markdown("---")
     st.markdown("### Sandbox: ask the data your own question")

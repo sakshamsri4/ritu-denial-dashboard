@@ -120,7 +120,8 @@ dashboard uses pandas because the data is already in memory, but the SQL is what
 write against the billing system's warehouse.
 
 **Want to be able to write this yourself?** The **SQL Lab** tab teaches it in twelve steps,
-from `SELECT` to this exact report, with a checker that tells you what is off.
+from `SELECT` to this exact report, with a checker that tells you what is off, and a practice
+test of up to 50 generated questions under every lesson.
 """
 
 
